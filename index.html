@@ -69,7 +69,13 @@
     <script src="https://www.google.com/recaptcha/api.js?render=6Leffq4UAAAAAKLIsZ4HLYVmrC3okzORHiAlObYe"></script>
 
     <script>
-        // 
+        function hideOnFocus($param) {
+            $("input, textarea").focus(function () {
+                $param.fadeOut();
+            });
+        }
+
+        // Recaptcha check
         grecaptcha.ready(function () {
             grecaptcha.execute('6Leffq4UAAAAAKLIsZ4HLYVmrC3okzORHiAlObYe', {
                 action: 'ajaxForm'
@@ -78,7 +84,7 @@
             });
         });
 
-        //
+        // Submit form
         $(' #ajaxForm ').on('submit', function (e) {
             e.preventDefault();
 
@@ -99,15 +105,18 @@
                         $responseSuccess.removeClass("d-none");
                         $responseSuccess.hide().html(response.response).fadeIn();
                         $form[0].reset();
+                        hideOnFocus($responseSuccess);
                     } else {
                         $responseError.removeClass("d-none");
                         $responseError.hide().html(response.response).fadeIn();
+                        hideOnFocus($responseError);
                     }
                 },
 
                 error: function (response) {
                     $responseError.removeClass("d-none");
                     $responseError.html(response.responseText).show();
+                    hideOnFocus($responseError);
                 }
             });
 
