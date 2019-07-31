@@ -51,7 +51,7 @@ class Ajax_Form {
     ];
 
     /**
-     * Ajax_Form constructor
+     * Ajax_Form __constructor
      */
     public function __construct() {
 
