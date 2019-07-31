@@ -56,7 +56,7 @@ class Ajax_Form {
     public function __construct() {
 
         # Ajax check.
-        if ( ! isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) || 'XMLHttpRequest' !== $_SERVER['HTTP_X_REQUESTED_WITH'] ) {
+        if (!isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) || 'XMLHttpRequest' !== $_SERVER['HTTP_X_REQUESTED_WITH']) {
             $this->errorHandler('ajax_only');
         }
 
@@ -74,17 +74,17 @@ class Ajax_Form {
         $isEmailValid = filter_var($email, FILTER_VALIDATE_EMAIL);
 
         # Check if email has been entered and is valid
-        if ( ! $isEmailValid || ! $email ) {
+        if (!$isEmailValid || !$email) {
             $this->errorHandler('enter_email');
         }
 
         # Check if name has been entered
-        if ( ! $name ) {
+        if (!$name) {
             $this->errorHandler('enter_name');
         }
 
         # Check if message has been entered
-        if ( ! $message ) {
+        if (!$message) {
             $this->errorHandler('enter_message');
         }
 
@@ -103,6 +103,7 @@ class Ajax_Form {
         $resp = $recaptcha
             ->setExpectedHostname($_SERVER['SERVER_NAME'])
             ->verify($_POST['token'], $_SERVER['REMOTE_ADDR']);
+
         if ($resp->isSuccess()) {
 
             # PHPMailer 
@@ -113,7 +114,6 @@ class Ajax_Form {
                 $mail->setLanguage($this->language, 'vendor/phpmailer/language');
 
                 # Server settings
-                // $mail->SMTPDebug = 2;
                 $mail->isSMTP();                        # Set mailer to use SMTP
                 $mail->Host       = $this->host;        # Specify main and backup SMTP servers
                 $mail->SMTPAuth   = $this->smtp_auth;   # Enable SMTP authentication
@@ -139,11 +139,8 @@ class Ajax_Form {
 
             } catch (Exception $e) {
                 $this->errorHandler('error');
-                // echo "Erreur Mailer: {$mail->ErrorInfo}";
             }
         } else {
-            $errors = $resp->getErrorCodes();
-            print_r($recaptcha);
             $this->errorHandler('recaptcha-error');
         }
     }
@@ -157,7 +154,7 @@ class Ajax_Form {
      * @return string
      */
     public function template($string, $vars) {
-        foreach ( $vars as $name => $val ) {
+        foreach ($vars as $name => $val) {
             $string = str_replace("{{{$name}}}", $val, $string);
         }
         return $string;
@@ -171,7 +168,7 @@ class Ajax_Form {
      * @return string
      */
     public function getString($string) {
-        return isset( $this->strings[$string] ) ? $this->strings[$string] : $string;
+        return isset($this->strings[$string]) ? $this->strings[$string] : $string;
     }
 
     /**
