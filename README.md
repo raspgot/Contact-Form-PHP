@@ -21,6 +21,8 @@ cd AjaxContactForm-PHPMailer-reCAPTCHA-v3
 composer install
 ```
 
+Replace [$password](https://www.ovh.com/fr/emails/email-pro) and [$secret](https://www.google.com/recaptcha) in AjaxForm.php
+
 ## Dependencies
 
 * [PHPMailer](https://github.com/PHPMailer/PHPMailer)
