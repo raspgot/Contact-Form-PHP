@@ -29,12 +29,10 @@ class Ajax_Form {
     protected $smtp_auth   = true;
     protected $port        = 587;
 
-    # reCAPTCHA v3
-    private $public        = '6Leffq4UAAAAAKLIsZ4HLYVmrC3okzORHiAlObYe';
+    # reCAPTCHA v3 | https://www.google.com/recaptcha
     private $secret        = '';
 
     # Ajax_Form
-    public $to             = 'gauthierw630@gmail.com';
     public $subject        = 'Nouveau message !';
     public $strings        = [
         'success'           => 'Votre message a bien été envoyé 🙂',
@@ -126,7 +124,7 @@ class Ajax_Form {
             
                 # Recipients
                 $mail->setFrom($this->username, 'Raspgot');
-                $mail->addAddress($this->to, 'Gauthier');
+                $mail->addAddress($email, 'Gauthier');
                 $mail->addReplyTo($this->username, 'Information');
             
                 # Content
@@ -145,6 +143,7 @@ class Ajax_Form {
             }
         } else {
             $errors = $resp->getErrorCodes();
+            print_r($recaptcha);
             $this->errorHandler('recaptcha-error');
         }
     }
