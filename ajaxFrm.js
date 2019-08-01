@@ -33,13 +33,6 @@ $(' #ajaxForm ').on('submit', function (e) {
     var $responseSuccess = $form.find('.response-success');
     var $responseError = $form.find('.response-error');
 
-    $.post( "test.php", $( "#testform" ).serialize() );
-
-    $.post(
-        $form.attr('action'),
-        $form.serialize() + '&token=' + $token,
-    );
-
     $.ajax({
         type: 'POST',
         url: $form.attr('action'),
