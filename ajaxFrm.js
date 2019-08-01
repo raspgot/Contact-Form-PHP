@@ -1,3 +1,8 @@
+/*
+ *  $.ajax | type: 'POST' (https://api.jquery.com/jquery.ajax/)
+ *  @author Raspgot
+*/
+
 function check_grecaptcha() {
     grecaptcha.ready(function () {
         grecaptcha.execute('6Leffq4UAAAAAKLIsZ4HLYVmrC3okzORHiAlObYe', {
@@ -27,6 +32,13 @@ $(' #ajaxForm ').on('submit', function (e) {
     var $token = $('[name="recaptcha-token"]').val();
     var $responseSuccess = $form.find('.response-success');
     var $responseError = $form.find('.response-error');
+
+    $.post( "test.php", $( "#testform" ).serialize() );
+
+    $.post(
+        $form.attr('action'),
+        $form.serialize() + '&token=' + $token,
+    );
 
     $.ajax({
         type: 'POST',

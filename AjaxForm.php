@@ -84,7 +84,7 @@ class Ajax_Form {
         }
 
         # Check if message has been entered
-        if (!$message) {
+        if (!$message || strlen($message) < 2 ) {
             $this->errorHandler('enter_message');
         }
 
@@ -124,7 +124,8 @@ class Ajax_Form {
             
                 # Recipients
                 $mail->setFrom($this->username, 'Raspgot');
-                $mail->addAddress($email, 'Gauthier');
+                $mail->addAddress($email, $name);
+                $mail->AddCC($this->username, 'Dev_copy');
                 $mail->addReplyTo($this->username, 'Information');
             
                 # Content
