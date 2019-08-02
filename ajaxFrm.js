@@ -1,7 +1,7 @@
 /*
- *  $.ajax | type: 'POST' (https://api.jquery.com/jquery.ajax/)
+ *  $.post (https://api.jquery.com/jQuery.post)
  *  @author Raspgot
-*/
+ */
 
 function check_grecaptcha() {
     grecaptcha.ready(function () {
@@ -33,32 +33,31 @@ $(' #ajaxForm ').on('submit', function (e) {
     var $responseSuccess = $form.find('.response-success');
     var $responseError = $form.find('.response-error');
 
-    $.ajax({
-        type: 'POST',
-        url: $form.attr('action'),
-        data: $form.serialize() + '&token=' + $token,
+    $.post(
+        $form.attr('action'),
+        $form.serialize() + '&token=' + $token
+    )
 
-        success: function (response) {
-            response = JSON.parse(response);
+    .done(function (response) {
+        response = JSON.parse(response);
 
-            if (response.type && response.type === 'success') {
-                $responseSuccess.removeClass("d-none");
-                $responseSuccess.hide().html(response.response).fadeIn();
-                $form[0].reset();
-                check_grecaptcha()
-                hideOnFocus($responseSuccess);
-            } else {
-                $responseError.removeClass("d-none");
-                $responseError.hide().html(response.response).fadeIn();
-                hideOnFocus($responseError);
-            }
-        },
-
-        error: function (response) {
+        if (response.type && response.type === 'success') {
+            $responseSuccess.removeClass("d-none");
+            $responseSuccess.hide().html(response.response).fadeIn();
+            $form[0].reset();
+            check_grecaptcha()
+            hideOnFocus($responseSuccess);
+        } else {
             $responseError.removeClass("d-none");
-            $responseError.html(response.responseText).show();
+            $responseError.hide().html(response.response).fadeIn();
             hideOnFocus($responseError);
         }
+    })
+
+    .fail(function (response) {
+        $responseError.removeClass("d-none");
+        $responseError.html(response.responseText).show();
+        hideOnFocus($responseError);
     });
 
 });
