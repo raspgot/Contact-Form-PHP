@@ -1,11 +1,12 @@
-/*
- *  $.post (https://api.jquery.com/jQuery.post)
- *  @author Raspgot
- */
+// $.post (https://api.jquery.com/jQuery.post)
+// reCaptcha v3 (https://developers.google.com/recaptcha/docs/v3=)
+// @author Raspgot
+
+const publicKey = '';
 
 function check_grecaptcha() {
     grecaptcha.ready(function () {
-        grecaptcha.execute('6Leffq4UAAAAAKLIsZ4HLYVmrC3okzORHiAlObYe', {
+        grecaptcha.execute(publicKey, {
             action: 'ajaxForm'
         }).then(function (token) {
             $('[name="recaptcha-token"]').val(token);
@@ -13,25 +14,26 @@ function check_grecaptcha() {
     });
 }
 
+// Hide alert <div> on focus fields
 function hideOnFocus($param) {
     $("input, textarea").focus(function () {
         $param.fadeOut();
     });
 }
 
-// Recaptcha check
+// Recaptcha check on DOM ready
 $(function () {
     check_grecaptcha()
 });
 
-// Submit form
+// Submit the form
 $(' #ajaxForm ').on('submit', function (e) {
     e.preventDefault();
 
-    var $form = $(this);
-    var $token = $('[name="recaptcha-token"]').val();
-    var $responseSuccess = $form.find('.response-success');
-    var $responseError = $form.find('.response-error');
+    let $form = $(this);
+    let $token = $('[name="recaptcha-token"]').val();
+    let $respError   = $form.find('.response-error');
+    let $respSuccess = $form.find('.response-success');
 
     $.post(
         $form.attr('action'),
@@ -42,22 +44,22 @@ $(' #ajaxForm ').on('submit', function (e) {
         response = JSON.parse(response);
 
         if (response.type && response.type === 'success') {
-            $responseSuccess.removeClass("d-none");
-            $responseSuccess.hide().html(response.response).fadeIn();
+            $respSuccess.removeClass("d-none");
+            $respSuccess.hide().html(response.response).fadeIn();
             $form[0].reset();
             check_grecaptcha()
-            hideOnFocus($responseSuccess);
+            hideOnFocus($respSuccess);
         } else {
-            $responseError.removeClass("d-none");
-            $responseError.hide().html(response.response).fadeIn();
-            hideOnFocus($responseError);
+            $respError.removeClass("d-none");
+            $respError.hide().html(response.response).fadeIn();
+            hideOnFocus($respError);
         }
     })
 
     .fail(function (response) {
-        $responseError.removeClass("d-none");
-        $responseError.html(response.responseText).show();
-        hideOnFocus($responseError);
+        $respError.removeClass("d-none");
+        $respError.html(response.responseText).show();
+        hideOnFocus($respError);
     });
 
 });
