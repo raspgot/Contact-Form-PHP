@@ -15,7 +15,7 @@ require __DIR__ . '/vendor/autoload.php';
  * @package     PHPMailer | reCAPTCHA v3
  * @author      Gauthier Witkowski <hello@raspgot.fr>
  * @link        https://raspgot.fr
- * @version     1.0.0
+ * @version     1.0.1
  */
 
 class Ajax_Form {
@@ -30,21 +30,21 @@ class Ajax_Form {
     protected $port        = 587;
 
     # reCAPTCHA v3 | https://www.google.com/recaptcha
-    private $secret        = '';
+    private $secret = '';
 
     # Ajax_Form
-    public $subject        = 'Nouveau message !';
+    public $subject        = 'New message !';
     public $strings        = [
-        'success'           => 'Votre message a bien été envoyé 🙂',
-        'recaptcha-error'   => 'Erreur dans la réponse du recaptcha',
-        'error'             => 'Désolé, une erreur s\'est produite lors de l\'envoi de votre message 😕',
-        'enter_name'        => 'Veuillez entrez votre nom.',
-        'enter_email'       => 'Veuillez entrez un email valide.',
-        'enter_message'     => 'Veuillez entrez votre message.',
+        'success'           => 'Your message has been sent 🙂',
+        'recaptcha-error'   => 'Error in recaptcha response',
+        'error'             => 'Sorry, an error occurred while sending your message 😕',
+        'enter_name'        => 'Please enter your name.',
+        'enter_email'       => 'Please enter a valid email.',
+        'enter_message'     => 'Please enter your message.',
         'ajax_only'         => 'Asynchronous anonymous 🎭',
         'body'              => '
             <h1>{{subject}}</h1>
-            <p><strong>Nom :</strong> {{name}}</p>
+            <p><strong>Name :</strong> {{name}}</p>
             <p><strong>E-Mail :</strong> {{email}}</p>
             <p><strong>Message :</strong><br>{{message}}</p>
         ',
@@ -74,19 +74,13 @@ class Ajax_Form {
         $isEmailValid = filter_var($email, FILTER_VALIDATE_EMAIL);
 
         # Check if email has been entered and is valid
-        if (!$isEmailValid || !$email) {
-            $this->errorHandler('enter_email');
-        }
+        if (!$isEmailValid || !$email) $this->errorHandler('enter_email');
 
         # Check if name has been entered
-        if (!$name) {
-            $this->errorHandler('enter_name');
-        }
+        if (!$name) $this->errorHandler('enter_name');
 
         # Check if message has been entered
-        if (!$message || strlen($message) < 2 ) {
-            $this->errorHandler('enter_message');
-        }
+        if (!$message) $this->errorHandler('enter_message');
 
         # Prepare body
         $body = $this->getString('body');
