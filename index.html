@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/cosmo/bootstrap.min.css">
-    <title>AjaxContactForm-PHPMailer-reCAPTCHA-v3</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/flatly/bootstrap.min.css">
+    <title>Ajax form</title>
 
     <style>
         html,
@@ -38,10 +38,10 @@
 
         <h4 class="font-weight-bolder mb-2">AjaxContactForm</h4>
         <a href="https://github.com/PHPMailer/PHPMailer">
-            <h5 class="mb-2">PHPMailer</h5>
+            <h6 class="mb-2">PHPMailer</h6>
         </a>
-        <a href="https://github.com/google/recaptcha">
-            <h5 class="mb-4">reCAPTCHA v3</h5>
+        <a href="https://developers.google.com/recaptcha/docs/v3">
+            <h6 class="mb-4">reCAPTCHA v3</h6>
         </a>
         
         <!-- Statut -->
@@ -50,13 +50,13 @@
 
         <!-- Form -->
         <div class="form-group">
-            <input type="text" class="form-control" name="name" placeholder="Nom" required>
+            <input type="text" class="form-control" name="name" placeholder="Name" required>
         </div>
         <div class="form-group">
             <input type="email" class="form-control" name="email" placeholder="Email" required>
         </div>
         <div class="form-group">
-            <textarea name="message" class="form-control" rows="6" placeholder="Votre message" aria-required="true" required></textarea>
+            <textarea name="message" class="form-control" rows="6" placeholder="Your message" aria-required="true" required></textarea>
         </div>
         <input type="submit" class="btn btn-primary btn-lg w-100" value="Envoyer">
 
@@ -66,8 +66,8 @@
     </form>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://www.google.com/recaptcha/api.js?render=6Leffq4UAAAAAKLIsZ4HLYVmrC3okzORHiAlObYe"></script>
-    <script src="ajaxFrm.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=MY_GOOGLE_KEY"></script>
+    <script src="AjaxForm.js"></script>
 
 </body>
 
