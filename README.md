@@ -43,7 +43,7 @@ const publicKey = '';
 #### Optionnal
 If you wanna update vendor folder use the update [composer](https://getcomposer.org/) commande
 ```
-compser update
+composer update
 ```
 ## Author
 ![raspgot](https://dev.raspgot.fr/AjaxContactForm-PHPMailer/raspgot.png)
