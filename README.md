@@ -16,6 +16,7 @@ Direct download [HERE](https://github.com/raspgot/AjaxContactForm-PHPMailer-reCA
 Or use git :
 ```
 git clone https://github.com/raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3.git
+composer install
 ```
 
 ## Configuration
