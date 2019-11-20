@@ -1,74 +1,74 @@
 <!DOCTYPE html>
 <html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/flatly/bootstrap.min.css">
+        <title>Ajax form</title>
+        <style>
+            html,
+            body {
+                height: 100%;
+            }
+            body {
+                display: flex;
+                align-items: center;
+                background-color: #f5f5f5;
+            }
+            .form-signin {
+                width: 100%;
+                max-width: 350px;
+            }
+            .form-signin .form-control {
+                height: auto;
+                padding: .8rem;
+                font-size: 16px;
+            }
+        </style>
+    </head>
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/flatly/bootstrap.min.css">
-    <title>Ajax form</title>
+    <body class="text-center py-2">
+        <form action="AjaxForm.php" class="form-signin shadow rounded m-auto p-5" id="ajaxForm">
 
-    <style>
-        html,
-        body {
-            height: 100%;
-        }
+            <h4 class="font-weight-bolder mb-2">AjaxContactForm</h4>
+            <a href="https://github.com/PHPMailer/PHPMailer">
+                <h6 class="mb-2">PHPMailer</h6>
+            </a>
+            <a href="https://developers.google.com/recaptcha/docs/v3">
+                <h6 class="mb-2">reCAPTCHA v3</h6>
+            </a>
+            <div class="my-2">
+                <a class="github-button" href="https://github.com/raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3"
+                    data-size="large" data-show-count="true"
+                    aria-label="Star raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3 on GitHub">Star This !</a>
+            </div>
 
-        body {
-            display: flex;
-            align-items: center;
-            background-color: #f5f5f5;
-        }
+            <!-- Statut -->
+            <div class="response-success alert alert-success d-none" role="alert"></div>
+            <div class="response-error alert-danger d-none" role="alert"></div>
 
-        .form-signin {
-            width: 100%;
-            max-width: 350px;
-        }
+            <!-- Form -->
+            <div class="form-group">
+                <input type="text" class="form-control" name="name" placeholder="Name" required>
+            </div>
+            <div class="form-group">
+                <input type="email" class="form-control" name="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <textarea name="message" class="form-control" rows="6" placeholder="Your message" aria-required="true"
+                    required></textarea>
+            </div>
+            <input type="submit" class="btn btn-primary btn-lg w-100" value="Envoyer">
 
-        .form-signin .form-control {
-            height: auto;
-            padding: .8rem;
-            font-size: 16px;
-        }
-    </style>
-</head>
+            <!-- Token value | recaptcha -->
+            <input name="recaptcha-token" type="hidden">
 
-<body class="text-center py-2">
+        </form>
 
-    <form action="AjaxForm.php" class="form-signin m-auto p-3" id="ajaxForm">
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script async defer src="https://buttons.github.io/buttons.js"></script>
+        <script src="https://www.google.com/recaptcha/api.js?render=MY_PUBLIC_KEY"></script>
+        <script src="AjaxForm.js"></script>
 
-        <h4 class="font-weight-bolder mb-2">AjaxContactForm</h4>
-        <a href="https://github.com/PHPMailer/PHPMailer">
-            <h6 class="mb-2">PHPMailer</h6>
-        </a>
-        <a href="https://developers.google.com/recaptcha/docs/v3">
-            <h6 class="mb-4">reCAPTCHA v3</h6>
-        </a>
-        
-        <!-- Statut -->
-        <div class="response-success alert alert-success d-none" role="alert"></div>
-        <div class="response-error alert-danger d-none" role="alert"></div>
-
-        <!-- Form -->
-        <div class="form-group">
-            <input type="text" class="form-control" name="name" placeholder="Name" required>
-        </div>
-        <div class="form-group">
-            <input type="email" class="form-control" name="email" placeholder="Email" required>
-        </div>
-        <div class="form-group">
-            <textarea name="message" class="form-control" rows="6" placeholder="Your message" aria-required="true" required></textarea>
-        </div>
-        <input type="submit" class="btn btn-primary btn-lg w-100" value="Envoyer">
-
-        <!-- Token value | recaptcha -->
-        <input name="recaptcha-token" type="hidden">
-
-    </form>
-
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://www.google.com/recaptcha/api.js?render=MY_GOOGLE_KEY"></script>
-    <script src="AjaxForm.js"></script>
-
-</body>
-
+    </body>
 </html>

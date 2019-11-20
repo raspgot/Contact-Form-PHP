@@ -22,8 +22,8 @@ class Ajax_Form {
     
     # PHPMailer
     protected $language    = 'fr';
-    protected $host        = 'pro1.mail.ovh.net';
-    protected $username    = 'hello@raspgot.fr';
+    protected $host        = 'mail.infomaniak.com';
+    protected $username    = 'contact@raspgot.fr';
     protected $password    = '';
     protected $smtp_secure = 'tls';
     protected $smtp_auth   = true;

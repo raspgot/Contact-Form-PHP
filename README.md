@@ -4,7 +4,7 @@
 ### [DEMO](https://dev.raspgot.fr/github/contact-form-recaptcha-v3)
 SMTP email sending system with ajax and recaptcha v3 for PHP.
 
-![raspgot](https://dev.raspgot.fr/AjaxContactForm-PHPMailer/screen.jpg)
+![raspgot](https://dev.raspgot.fr/AjaxContactForm-PHPMailer/screen.png)
 
 ## Description
 * SMTP Authentication
@@ -21,7 +21,7 @@ composer install
 
 ## Configuration
 Captcha key -> [HERE](https://www.google.com/recaptcha/intro/v3.html)
-SMTP sender -> [HERE](https://www.ovh.com/fr/emails/email-pro/)
+SMTP sender -> [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)
 
 **AjaxForm.php**
 ```
