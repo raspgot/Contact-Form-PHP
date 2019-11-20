@@ -1,7 +1,7 @@
 
 # AjaxContactForm
 
-### [DEMO](https://dev.raspgot.fr/AjaxContactForm-PHPMailer/)
+### [DEMO](https://dev.raspgot.fr/github/contact-form-recaptcha-v3)
 SMTP email sending system with ajax and recaptcha v3 for PHP.
 
 ![raspgot](https://dev.raspgot.fr/AjaxContactForm-PHPMailer/screen.jpg)
