@@ -24,7 +24,7 @@ Captcha key -> [HERE](https://www.google.com/recaptcha/intro/v3.html)
 SMTP sender -> [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)
 
 **AjaxForm.php**
-```
+```php
 protected $host     = 'pro1.mail.ovh.net';
 protected $username = 'hello@raspgot.fr';
 protected $password = '';
