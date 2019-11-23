@@ -52,5 +52,5 @@ You can visit my [Portfolio](https://raspgot.fr)
 ## Dependencies
 * [PHPMailer](https://github.com/PHPMailer/PHPMailer)
 * [reCAPTCHA PHP client library](https://github.com/google/recaptcha)
-* [Bootstrap](https://getbootstrap.com/)
+* [Bootswatch](https://bootswatch.com/)
 * [Jquery](https://jquery.com/)
