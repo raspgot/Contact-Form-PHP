@@ -12,8 +12,6 @@ SMTP email sending system with ajax and recaptcha v3 for PHP.
 * Validation and input's security
 
 ## Installation
-Direct download [HERE](https://github.com/raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3/archive/master.zip)
-Or use git :
 ```
 git clone https://github.com/raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3.git
 composer install
@@ -32,12 +30,12 @@ private $secret     = '';
 ```
 
 **AjaxForm.js**
-```
+```javascript
 const publicKey = '';
 ```
 
 **index.html**
-```
+```html
 <script src="https://www.google.com/recaptcha/api.js?render=MY_GOOGLE_KEY"></script>
 ```
 
