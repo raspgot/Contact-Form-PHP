@@ -23,10 +23,11 @@ SMTP sender -> [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebe
 
 **AjaxForm.php**
 ```php
-protected $host     = 'mail.infomaniak.com';
-protected $username = 'contact@raspgot.fr';
-protected $password = '';
-private   $secret   = '';
+# Constants to redefined
+const HOST        = 'mail.infomaniak.com';
+const USERNAME    = 'contact@raspgot.fr';
+const PASSWORD    = '';
+const SECRET_KEY  = ''; #Google reCAPTCHA
 ```
 
 **AjaxForm.js**
