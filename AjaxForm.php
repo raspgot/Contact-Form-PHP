@@ -1,52 +1,47 @@
 <?php
-
     use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\Exception;
+    use PHPMailer\PHPMailer\SMTP;
 
-    require_once __DIR__ . '/vendor/PHPMailer/Exception.php';
+    date_default_timezone_set('Europe/Paris');
+
     require_once __DIR__ . '/vendor/PHPMailer/PHPMailer.php';
     require_once __DIR__ . '/vendor/PHPMailer/SMTP.php';
     require_once __DIR__ . '/vendor/recaptcha/autoload.php';
 
     /**
-     * Class Ajax_Form
-     *
-     * Class to send emails using ajax with validations security
-     *
-     * @package     PHPMailer | reCAPTCHA v3
-     * @author      Gauthier Witkowski <hello@raspgot.fr>
-     * @link        https://raspgot.fr
-     * @version     1.0.2
+     * Ajax_Form - Send email using ajax with validations security
+     * 
+     * @see      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
+     * @package  PHPMailer | reCAPTCHA v3
+     * @author   Gauthier Witkowski <contact@raspgot.fr>
+     * @link     https://raspgot.fr
+     * @version  1.0.2
      */
 
     class Ajax_Form {
         
-        # PHPMailer
-        protected $host        = 'mail.infomaniak.com';
-        protected $username    = 'contact@raspgot.fr';
-        protected $password    = '';
-        protected $smtp_secure = 'tls';
-        protected $smtp_auth   = true;
-        protected $port        = 587;
-
-        # reCAPTCHA v3 | https://www.google.com/recaptcha
-        private $secret = '';
-
-        # Ajax_Form
-        public $subject        = 'New message !';
-        public $strings        = [
-            'success'           => 'Your message has been sent 🙂',
-            'recaptcha-error'   => 'Error in recaptcha response',
-            'error'             => 'Sorry, an error occurred while sending your message 😕',
-            'enter_name'        => 'Please enter your name.',
-            'enter_email'       => 'Please enter a valid email.',
-            'enter_message'     => 'Please enter your message.',
-            'ajax_only'         => 'Asynchronous anonymous 🎭',
-            'body'              => '
+        # Constants to redefined
+        const HOST        = 'mail.infomaniak.com';
+        const USERNAME    = 'contact@raspgot.fr';
+        const PASSWORD    = '';
+        const SMTP_SECURE = PHPMailer::ENCRYPTION_STARTTLS;
+        const SMTP_AUTH   = true;
+        const PORT        = 587;
+        const SECRET_KEY  = '';
+        const SUBJECT     = 'New message !';
+        public $handler   = [
+            'success'         => 'Your message has been sent 🙂',
+            'recaptcha-error' => 'Error in recaptcha response',
+            'error'           => 'Sorry, an error occurred while sending your message 😕',
+            'enter_name'      => 'Please enter your name.',
+            'enter_email'     => 'Please enter a valid email.',
+            'enter_message'   => 'Please enter your message.',
+            'ajax_only'       => 'Asynchronous anonymous 🎭',
+            'body'            => '
                 <h1>{{subject}}</h1>
                 <p><strong>Name :</strong> {{name}}</p>
                 <p><strong>E-Mail :</strong> {{email}}</p>
-                <p><strong>Message :</strong><br>{{message}}</p>
+                <p><strong>Message :</strong> {{message}}</p>
             ',
         ];
 
@@ -55,97 +50,84 @@
          */
         public function __construct() {
 
-            # Ajax check.
-            if (!isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) || 'XMLHttpRequest' !== $_SERVER['HTTP_X_REQUESTED_WITH']) {
-                $this->errorHandler('ajax_only');
+            # Check if request is Ajax request
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 'XMLHttpRequest' !== $_SERVER['HTTP_X_REQUESTED_WITH']) {
+                $this->statusHandler('ajax_only', 'error');
             }
 
             # Get secure post data
-            $name    = $this->secure($_POST['name']);
-            $email   = $this->secure($_POST['email']);
-            $message = $this->secure($_POST['message']);
+            $name    = filter_var($this->secure($_POST['name']), FILTER_SANITIZE_STRING);
+            $email   = filter_var($this->secure($_POST['email']), FILTER_SANITIZE_EMAIL);
+            $message = filter_var($this->secure($_POST['message']), FILTER_SANITIZE_STRING);
 
-            # Sanitize fields
-            $name    = filter_var($name, FILTER_SANITIZE_STRING);
-            $email   = filter_var($email, FILTER_SANITIZE_EMAIL);
-            $message = filter_var($message, FILTER_SANITIZE_STRING);
-
-            # Validate email
-            $isEmailValid = filter_var($email, FILTER_VALIDATE_EMAIL);
-
-            # Check if email has been entered and is valid
-            if (!$isEmailValid || !$email) $this->errorHandler('enter_email');
-
-            # Check if name has been entered
-            if (!$name) $this->errorHandler('enter_name');
-
-            # Check if message has been entered
-            if (!$message) $this->errorHandler('enter_message');
+            # Check if fields has been entered and valid
+            if (!$name) $this->statusHandler('enter_name', 'error');
+            if (!$email) $this->statusHandler('enter_email', 'error');
+            if (!$message) $this->statusHandler('enter_message', 'error');
 
             # Prepare body
             $body = $this->getString('body');
             $body = $this->template( $body, [
-                'subject' => $this->subject,
+                'subject' => self::SUBJECT,
                 'name'    => $name,
                 'email'   => $email,
                 'message' => $message,
             ] );
 
             # Verifying the user's response
-            # reCAPTCHA v3
-            $recaptcha = new \ReCaptcha\ReCaptcha($this->secret);
+            $recaptcha = new \ReCaptcha\ReCaptcha(self::SECRET_KEY);
             $resp = $recaptcha
                 ->setExpectedHostname($_SERVER['SERVER_NAME'])
                 ->verify($_POST['token'], $_SERVER['REMOTE_ADDR']);
 
             if ($resp->isSuccess()) {
 
-                # PHPMailer 
                 $mail = new PHPMailer(true);
 
                 try {
                     # Server settings
-                    $mail->isSMTP();                        # Set mailer to use SMTP
-                    $mail->Host       = $this->host;        # Specify main and backup SMTP servers
-                    $mail->SMTPAuth   = $this->smtp_auth;   # Enable SMTP authentication
-                    $mail->Username   = $this->username;    # SMTP username
-                    $mail->Password   = $this->password;    # SMTP password
-                    $mail->SMTPSecure = $this->smtp_secure; # Enable TLS encryption, `ssl` also accepted
-                    $mail->Port       = $this->port;        # TCP port
+                    $mail->SMTPDebug  = SMTP::DEBUG_OFF;   # Enable verbose debug output
+                    $mail->isSMTP();                       # Set mailer to use SMTP
+                    $mail->Host       = self::HOST;        # Specify main and backup SMTP servers
+                    $mail->SMTPAuth   = self::SMTP_AUTH;   # Enable SMTP authentication
+                    $mail->Username   = self::USERNAME;    # SMTP username
+                    $mail->Password   = self::PASSWORD;    # SMTP password
+                    $mail->SMTPSecure = self::SMTP_SECURE; # Enable TLS encryption, `ssl` also accepted
+                    $mail->Port       = self::PORT;        # TCP port
                 
                     # Recipients
-                    $mail->setFrom($this->username, 'Raspgot');
+                    $mail->setFrom(self::USERNAME, 'Raspgot');
                     $mail->addAddress($email, $name);
-                    $mail->AddCC($this->username, 'Dev_copy');
-                    $mail->addReplyTo($this->username, 'Information');
+                    $mail->AddCC(self::USERNAME, 'Dev_copy');
+                    $mail->addReplyTo(self::USERNAME, 'Information');
                 
                     # Content
                     $mail->CharSet = 'UTF-8';
                     $mail->isHTML(true);
-                    $mail->Subject = $this->subject;
+                    $mail->Subject = self::SUBJECT;
                     $mail->Body    = $body;
                     $mail->AltBody = strip_tags($body);;
                 
                     $mail->send();
-                    $this->successHandler('success');
+                    $this->statusHandler('success', 'success');
 
                 } catch (Exception $e) {
-                    $this->errorHandler('error');
+                    $this->statusHandler('error', 'error');
                 }
             } else {
-                $this->errorHandler('recaptcha-error');
+                $this->statusHandler('recaptcha-error', 'error');
             }
         }
 
         /**
          * Template string
          *
-         * @param $string
-         * @param $vars
-         *
+         * @param string $string
+         * @param array $vars
          * @return string
          */
-        public function template($string, $vars) {
+        public function template($string, $vars)
+        {
             foreach ($vars as $name => $val) {
                 $string = str_replace("{{{$name}}}", $val, $string);
             }
@@ -155,22 +137,22 @@
         /**
          * Get string from $string variable
          *
-         * @param $string
-         *
+         * @param string $string
          * @return string
          */
-        public function getString($string) {
-            return isset($this->strings[$string]) ? $this->strings[$string] : $string;
+        public function getString($string)
+        {
+            return isset($this->handler[$string]) ? $this->handler[$string] : $string;
         }
 
         /**
-         * Secure input field
+         * Secure inputs fields
          *
-         * @param $post
-         *
+         * @param string $post
          * @return string
          */
-        public function secure($post) {
+        public function secure($post)
+        {
             $post = htmlspecialchars($post);
             $post = stripslashes($post);
             $post = trim($post);
@@ -178,27 +160,18 @@
         }
 
         /**
-         * Error result
+         * Error or success message
          *
-         * @param $message
+         * @param string $message
+         * @param string $status
+         * @return json
          */
-        public function errorHandler($message) {
-            die(json_encode(array(
-                'type'     => 'error',
-                'response' => $this->getString($message),
-            )));
-        }
-
-        /**
-         * Success result
-         *
-         * @param $message
-         */
-        public function successHandler($message) {
-            die(json_encode(array(
-                'type'     => 'success',
-                'response' => $this->getString($message),
-            )));
+        public function statusHandler($message, $status)
+        {
+            die(json_encode([
+                'type'     => $status,
+                'response' => $this->getString($message)
+            ]));
         }
 
     }
