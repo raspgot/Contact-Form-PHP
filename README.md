@@ -1,8 +1,8 @@
 
-# AjaxContactForm
+# AjaxForm
 
 ### [DEMO](https://dev.raspgot.fr/github/contact-form-recaptcha-v3)
-SMTP email sending system with ajax and recaptcha v3 for PHP.
+Simple form system using Ajax, SMTP and recaptcha v3 for PHP.
 
 ![raspgot](https://dev.raspgot.fr/github/contact-form-recaptcha-v3/screen.png)
 
@@ -12,9 +12,9 @@ SMTP email sending system with ajax and recaptcha v3 for PHP.
 * Validation and input's security
 
 ## Installation
+Use clone command or [direct download](https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA/archive/master.zip)
 ```
-git clone https://github.com/raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3.git
-composer install
+git clone https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA.git
 ```
 
 ## Configuration
@@ -23,10 +23,10 @@ SMTP sender -> [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebe
 
 **AjaxForm.php**
 ```php
-protected $host     = 'pro1.mail.ovh.net';
-protected $username = 'hello@raspgot.fr';
+protected $host     = 'mail.infomaniak.com';
+protected $username = 'contact@raspgot.fr';
 protected $password = '';
-private $secret     = '';
+private   $secret   = '';
 ```
 
 **AjaxForm.js**
@@ -39,11 +39,6 @@ const publicKey = '';
 <script src="https://www.google.com/recaptcha/api.js?render=MY_GOOGLE_KEY"></script>
 ```
 
-#### Optionnal
-If you wanna update vendor folder use the update [composer](https://getcomposer.org/) commande
-```shell
-composer update
-```
 ## Author
 ![raspgot](https://dev.raspgot.fr/github/contact-form-recaptcha-v3/raspgot.png)
 
