@@ -27,7 +27,7 @@ SMTP sender -> [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebe
 const HOST        = 'mail.infomaniak.com';
 const USERNAME    = 'contact@raspgot.fr';
 const PASSWORD    = '';
-const SECRET_KEY  = ''; #Google reCAPTCHA
+const SECRET_KEY  = ''; // Google reCAPTCHA
 ```
 
 **AjaxForm.js**
