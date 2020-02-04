@@ -3,8 +3,9 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/flatly/bootstrap.min.css">
-        <title>Ajax form</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <title>AjaxContactForm</title>
         <style>
             html,
             body {
@@ -28,7 +29,7 @@
     </head>
 
     <body class="text-center py-2">
-        <form action="AjaxForm.php" class="form-signin shadow rounded m-auto p-5" id="ajaxForm">
+        <form action="AjaxForm.php" class="form-signin shadow-lg rounded m-auto p-5">
 
             <h4 class="font-weight-bolder mb-2">AjaxContactForm</h4>
             <a href="https://github.com/PHPMailer/PHPMailer">
@@ -44,8 +45,7 @@
             </div>
 
             <!-- Statut -->
-            <div class="response-success alert alert-success d-none" role="alert"></div>
-            <div class="response-error alert-danger d-none" role="alert"></div>
+            <div class="alert p-0" id="status" role="alert"></div>
 
             <!-- Form -->
             <div class="form-group">
@@ -58,7 +58,8 @@
                 <textarea name="message" class="form-control" rows="6" placeholder="Your message" aria-required="true"
                     required></textarea>
             </div>
-            <input type="submit" class="btn btn-primary btn-lg w-100" value="Envoyer">
+
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-lg w-100">SEND</span></button>
 
             <!-- Token value | recaptcha -->
             <input name="recaptcha-token" type="hidden">
@@ -67,7 +68,7 @@
 
         <script async defer src="https://buttons.github.io/buttons.js"></script>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-        <script src="https://www.google.com/recaptcha/api.js?render=6Leffq4UAAAAAKLIsZ4HLYVmrC3okzORHiAlObYe"></script>
+        <script src="https://www.google.com/recaptcha/api.js?render=PUBLIC_KEY"></script>
         <script src="AjaxForm.js"></script>
 
     </body>
