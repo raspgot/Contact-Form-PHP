@@ -18,7 +18,7 @@ git clone https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA.git
 ```
 
 ## Configuration
-Captcha key -> [HERE](https://www.google.com/recaptcha/intro/v3.html)
+Captcha key -> [HERE](https://www.google.com/recaptcha/intro/v3.html)   
 SMTP sender -> [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)
 
 **AjaxForm.php**
@@ -27,17 +27,17 @@ SMTP sender -> [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebe
 const HOST        = 'mail.infomaniak.com';
 const USERNAME    = 'contact@raspgot.fr';
 const PASSWORD    = '';
-const SECRET_KEY  = ''; // Google reCAPTCHA
+const SECRET_KEY  = ''; //Google reCAPTCHA
 ```
 
 **AjaxForm.js**
 ```javascript
-const publicKey = '';
+const publicKey = 'PUBLIC_KEY';
 ```
 
 **index.html**
 ```html
-<script src="https://www.google.com/recaptcha/api.js?render=MY_GOOGLE_KEY"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=PUBLIC_KEY"></script>
 ```
 
 ## Author
