@@ -4,7 +4,6 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/flatly/bootstrap.min.css">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <title>AjaxContactForm</title>
         <style>
             html,
@@ -28,10 +27,9 @@
         </style>
     </head>
 
-    <body class="text-center py-2">
-        <form action="AjaxForm.php" class="form-signin shadow-lg rounded m-auto p-5">
-
-            <h4 class="font-weight-bolder mb-2">AjaxContactForm</h4>
+    <body class="text-center">
+        <div class="form-signin shadow-lg rounded mx-auto p-5">
+            <h4 class="font-weight-bolder">AjaxContactForm</h4>
             <a href="https://github.com/PHPMailer/PHPMailer">
                 <h6 class="mb-2">PHPMailer</h6>
             </a>
@@ -39,37 +37,51 @@
                 <h6 class="mb-2">reCAPTCHA v3</h6>
             </a>
             <div class="my-2">
-                <a class="github-button" href="https://github.com/raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3"
-                    data-size="large" data-show-count="true"
-                    aria-label="Star raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3 on GitHub">Star This !</a>
+                <a class="github-button" href="https://github.com/raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3" data-size="large" data-show-count="true" aria-label="Star raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3 on GitHub">Star This !</a>
             </div>
-
-            <!-- Statut -->
-            <div class="alert p-0" id="status" role="alert"></div>
-
+            
             <!-- Form -->
-            <div class="form-group">
-                <input type="text" class="form-control" name="name" placeholder="Name" required>
+            <form action="AjaxForm.php" class="m-auto">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="name" placeholder="Name">
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-control" name="email" placeholder="Email">
+                </div>
+                <div class="form-group">
+                    <textarea name="message" class="form-control" rows="6" placeholder="Your message"></textarea>
+                </div>
+                <button type="submit" id="submit-btn" class="btn btn-primary btn-lg w-100">
+                    <div class="spinner-border spinner-border-sm mr-2 d-none" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    SEND
+                </button>
+                <!-- Token value | recaptcha -->
+                <input name="recaptcha-token" type="hidden">
+            </form>
+            
+            <!-- Alert status -->
+            <div role="alert" aria-live="assertive" aria-atomic="true" class="toast fixed-top m-3" data-delay="8000">
+                <div class="toast-header">
+                    <svg class=" rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                        <rect fill="#C4CBF5" width="100%" height="100%" />
+                    </svg>
+                    <strong class="mr-auto">Admin</strong>
+                    <small>A l'instant</small>
+                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="toast-body"></div>
             </div>
-            <div class="form-group">
-                <input type="email" class="form-control" name="email" placeholder="Email" required>
-            </div>
-            <div class="form-group">
-                <textarea name="message" class="form-control" rows="6" placeholder="Your message" aria-required="true"
-                    required></textarea>
-            </div>
-
-            <button type="submit" id="submit-btn" class="btn btn-primary btn-lg w-100">SEND</span></button>
-
-            <!-- Token value | recaptcha -->
-            <input name="recaptcha-token" type="hidden">
-
-        </form>
+        </div>
 
         <script async defer src="https://buttons.github.io/buttons.js"></script>
-        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
         <script src="https://www.google.com/recaptcha/api.js?render=PUBLIC_KEY"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
         <script src="AjaxForm.js"></script>
-
     </body>
 </html>
