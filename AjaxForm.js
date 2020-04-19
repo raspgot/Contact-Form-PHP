@@ -1,69 +1,9 @@
-// $.post (https://api.jquery.com/jQuery.post)
-// reCaptcha v3 (https://developers.google.com/recaptcha/docs/v3=)
+// .validate (https://jqueryvalidation.org)
+// .get (https://api.jquery.com/jQuery.get)
+// reCaptcha v3 (https://developers.google.com/recaptcha/docs/v3)
 // @author Raspgot
 
-const publicKey = "PUBLIC_KEY";
-
-$(document).ready(function () {
-    // Recaptcha init
-    check_grecaptcha();
-
-    // Submitting the form
-    $("form").submit(function (e) {
-        var form = $(this);
-        var token = $("[name='recaptcha-token']").val();
-        var btn_val = $("#submit-btn");
-        var init_btn_val = btn_val.html();
-
-        btn_val.prop("disabled", true);
-        btn_val.html("<i class='fa fa-circle-o-notch fa-spin'></i>")
-
-        $.post(form.attr("action"), form.serialize() + "&token=" + token)
-
-            .done(function (response) {
-                response = JSON.parse(response);
-
-                btn_val.prop("disabled", false);
-                btn_val.html(init_btn_val);
-
-                if (typeof response.type !== "undefined" && response.type === "success") {
-                    set_alert(response);
-                    form[0].reset();
-                    check_grecaptcha();
-                } else {
-                    set_alert(response);
-                }
-            })
-
-            .fail(function (response) {
-                set_alert(response);
-            });
-
-        e.preventDefault();
-    });
-});
-
-// Custom alert on ajax callback
-function set_alert(response) {
-    var type;
-    var status = $("#status");
-
-    switch (response.type) {
-        case "success":
-            type = "alert-success p-2";
-            break;
-    
-        case "error":
-            type = "alert-danger p-2";
-            break;
-        
-        default:
-            type = "alert-secondary p-2";
-            break;
-    }
-    status.html(response.response).addClass(type);
-    hideOnFocus(status);
-}
+const publicKey = " "; // GOOGLE public key
 
 // Get token from API
 function check_grecaptcha() {
@@ -76,9 +16,65 @@ function check_grecaptcha() {
     });
 }
 
-// Hide alert on focus fields
-function hideOnFocus(param) {
-    $("input, textarea").focus(function () {
-        param.fadeOut();
+$(document).ready(function () {
+    check_grecaptcha();
+    $("form").validate({
+        rules: {
+            name: {
+                required: true,
+                minlength: 3
+            },
+            email: {
+                required: true,
+                email: true
+            },
+            message: {
+                required: true,
+                minlength: 5
+            }
+        },
+        // Customize your messages
+        messages: {
+            name: {
+                required: "Please enter your name.",
+                minlength: "Must be at least 3 characters long."
+            },
+            email: "Please enter a valid email.",
+            message: {
+                required: "Please enter your message.",
+                minlength: "Must be at least 5 characters long."
+            }
+        },
+        errorClass: "invalid-feedback",
+        highlight: function (element) {
+            $(element).addClass("is-invalid").removeClass("is-valid");
+        },
+        unhighlight: function (element) {
+            $(element).addClass("is-valid").removeClass("is-invalid");
+        },
+        submitHandler: function (form) {
+            $(".spinner-border").removeClass("d-none");
+            var token = $("[name='recaptcha-token']").val();
+            $.get(form.action, $(form).serialize() + "&token=" + token)
+                .done(function (response) {
+                    $(".toast-body").html(JSON.parse(response));
+                    $(".toast").toast('show');
+                    $(".spinner-border").addClass("d-none");
+                    $("#submit-btn").prop("disabled", true);
+                    check_grecaptcha();
+                    setTimeout(function () {
+                        $("#submit-btn").prop("disabled", false);
+                        $("form").trigger("reset");
+                        $("form").each(function () {
+                            $(this).find(".form-control").removeClass("is-valid")
+                        })
+                    }, 3000);
+                })
+                .fail(function (response) {
+                    $(".toast-body").html(JSON.parse(response));
+                    $(".toast").toast('show');
+                    $(".spinner-border").addClass("d-none");
+                });
+        }
     });
-}
+});
