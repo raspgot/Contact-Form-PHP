@@ -54,8 +54,7 @@ $(document).ready(function () {
         },
         submitHandler: function (form) {
             $(".spinner-border").removeClass("d-none");
-            var token = $("[name='recaptcha-token']").val();
-            $.get(form.action, $(form).serialize() + "&token=" + token)
+            $.get(form.action, $(form).serialize())
                 .done(function (response) {
                     $(".toast-body").html(JSON.parse(response));
                     $(".toast").toast('show');
