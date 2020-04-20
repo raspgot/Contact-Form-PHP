@@ -14,7 +14,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\SMTP;
 
-# https://www.php.net/manual/fr/timezones.europe.php
+# https://www.php.net/manual/fr/timezones.php
 date_default_timezone_set('America/Los_Angeles');
 
 require __DIR__ . '/vendor/PHPMailer/Exception.php';
