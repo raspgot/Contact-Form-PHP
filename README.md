@@ -24,8 +24,9 @@ php -S localhost:8000
 Or use [XAMMP](https://www.apachefriends.org)
 
 ## Configuration
-SMTP sender &rarr; [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)
-GOOGLE keys &rarr; [HERE](https://www.google.com/recaptcha/intro/v3.html)   
+SMTP sender &rarr; [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)           
+GOOGLE keys &rarr; [HERE](https://www.google.com/recaptcha/intro/v3.html)           
+More configuration example [HERE](https://github.com/PHPMailer/PHPMailer/tree/master/examples)
 
 **AjaxForm.php**
 ```php
