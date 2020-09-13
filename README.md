@@ -1,5 +1,3 @@
-![PHPMailer](https://dev.raspgot.fr/github/contact-form-recaptcha-v3/raspgot-blue.png)
-
 # AjaxForm - SMTP & reCAPTCHA v3
 Simple form using Ajax, validations, SMTP and reCAPTCHA v3 for PHP.
 
@@ -9,6 +7,7 @@ Simple form using Ajax, validations, SMTP and reCAPTCHA v3 for PHP.
 You can try this: https://dev.raspgot.fr/github/contact-form-recaptcha-v3
 
 ## Features
+* Ajax submission
 * SMTP Authentication
 * Google reCAPTCHA v3
 * Validation and inputs security (PHP and JS)
@@ -24,22 +23,24 @@ php -S localhost:8000
 Or use [XAMMP](https://www.apachefriends.org)
 
 ## Configuration
-SMTP sender &rarr; [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)           
-GOOGLE keys &rarr; [HERE](https://www.google.com/recaptcha/intro/v3.html)           
-More configuration example [HERE](https://github.com/PHPMailer/PHPMailer/tree/master/examples)
+SMTP sender &rarr; [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)     
+GOOGLE keys &rarr; [HERE](https://www.google.com/recaptcha/intro/v3.html)     
+More configuration example &rarr; [HERE](https://github.com/PHPMailer/PHPMailer/tree/master/examples)
 
 **AjaxForm.php**
+https://www.php.net/manual/fr/timezones.php
 ```php
-# Constants to redefined
- const HOST = 'mail.infomaniak.com'; # SMTP server
- const USERNAME = ' '; # SMTP username
- const PASSWORD = ' '; # SMTP password
- const SECRET_KEY = ' '; # GOOGLE secret key
+date_default_timezone_set('America/Los_Angeles');     
+
+const HOST = 'mail.infomaniak.com'; #SMTP server
+const USERNAME = ''; #SMTP username
+const PASSWORD = ''; #SMTP password
+const SECRET_KEY = ''; #GOOGLE secret key
 ```
 
 **AjaxForm.js**
 ```javascript
-const publicKey = ' '; // GOOGLE public key
+const publicKey = ''; // GOOGLE public key
 ```
 
 **index.html**
@@ -48,7 +49,7 @@ const publicKey = ' '; // GOOGLE public key
 ```
 
 ## Author
-![raspgot](https://dev.raspgot.fr/github/contact-form-recaptcha-v3/raspgot-blue.png)
+![logo](https://dev.raspgot.fr/github/contact-form-recaptcha-v3/raspgot-blue.png)
 
 You can visit my [Portfolio](https://raspgot.fr) and star this repo if you like it 🤖
 
