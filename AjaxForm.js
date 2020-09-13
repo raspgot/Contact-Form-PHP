@@ -3,7 +3,7 @@
 // reCaptcha v3 (https://developers.google.com/recaptcha/docs/v3)
 // @author Raspgot
 
-const publicKey = " "; // GOOGLE public key
+const publicKey = ""; //GOOGLE public key
 
 // Get token from API
 function check_grecaptcha() {
@@ -16,7 +16,7 @@ function check_grecaptcha() {
     });
 }
 
-$(document).ready(function () {
+$(function() {
     check_grecaptcha();
     $("form").validate({
         rules: {
