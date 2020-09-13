@@ -27,8 +27,9 @@ SMTP sender &rarr; [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/
 GOOGLE keys &rarr; [HERE](https://www.google.com/recaptcha/intro/v3.html)     
 More configuration example &rarr; [HERE](https://github.com/PHPMailer/PHPMailer/tree/master/examples)
 
-**AjaxForm.php**
-https://www.php.net/manual/fr/timezones.php
+**AjaxForm.php**     
+Timezones doc &rarr; [HERE](https://www.php.net/manual/fr/timezones.php)     
+
 ```php
 date_default_timezone_set('America/Los_Angeles');     
 
