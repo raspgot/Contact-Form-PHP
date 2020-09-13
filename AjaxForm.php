@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Ajax_Form - Send email using ajax with validations security
+ * Simple form using Ajax, validations, SMTP and reCAPTCHA v3 for PHP.
  * 
  * @see      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
  * @package  PHPMailer | reCAPTCHA v3
@@ -25,13 +25,13 @@ require __DIR__ . '/vendor/recaptcha/autoload.php';
 class Ajax_Form {
     
     # Constants to redefined
-    const HOST        = ' '; # SMTP server
-    const USERNAME    = ' '; # SMTP username
-    const PASSWORD    = ' '; # SMTP password
+    const HOST        = 'mail.infomaniak.com'; #SMTP server
+    const USERNAME    = ''; #SMTP username
+    const PASSWORD    = ''; #SMTP password
     const SMTP_SECURE = PHPMailer::ENCRYPTION_STARTTLS;
     const SMTP_AUTH   = true;
     const PORT        = 587;
-    const SECRET_KEY  = ' '; # GOOGLE secret key
+    const SECRET_KEY  = ''; #GOOGLE secret key
     const SUBJECT     = 'New message !';
     public $handler   = [
         'success'       => '✔️ Your message has been sent.',
