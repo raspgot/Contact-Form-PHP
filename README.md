@@ -1,15 +1,15 @@
-# AjaxForm - SMTP & reCAPTCHA v3
-Simple form using Ajax, validations, SMTP and reCAPTCHA v3 for PHP.
+# Contact-Form-PHP
+Simple and secure contact form using Ajax, validations inputs, SMTP protocol and Google reCAPTCHA v3 in PHP.
 
-![raspgot](https://dev.raspgot.fr/github/contact-form-recaptcha-v3/screen-form.png)
+![raspgot](https://dev.raspgot.fr/github/contact-form-php/screen-form.png)
 
 ## Live Demo
-You can try this: https://dev.raspgot.fr/github/contact-form-recaptcha-v3
+You can try this: https://dev.raspgot.fr/github/contact-form-php
 
 ## Features
 * Ajax submission
-* SMTP Authentication
 * Google reCAPTCHA v3
+* PHPMailer SMTP Authentication
 * Validation and inputs security (PHP and JS)
 
 ## Installation
@@ -25,15 +25,15 @@ Or use [XAMMP](https://www.apachefriends.org)
 ## Configuration
 SMTP sender &rarr; [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)     
 GOOGLE keys &rarr; [HERE](https://www.google.com/recaptcha/intro/v3.html)     
-More configuration example &rarr; [HERE](https://github.com/PHPMailer/PHPMailer/tree/master/examples)
+More configurations examples &rarr; [HERE](https://github.com/PHPMailer/PHPMailer/tree/master/examples)
 
 **AjaxForm.php**     
 Timezones doc &rarr; [HERE](https://www.php.net/manual/fr/timezones.php)     
 
 ```php
-date_default_timezone_set('America/Los_Angeles');     
+date_default_timezone_set('');     
 
-const HOST = 'mail.infomaniak.com'; #SMTP server
+const HOST = ''; #SMTP server
 const USERNAME = ''; #SMTP username
 const PASSWORD = ''; #SMTP password
 const SECRET_KEY = ''; #GOOGLE secret key
@@ -50,13 +50,13 @@ const publicKey = ''; // GOOGLE public key
 ```
 
 ## Author
-![logo](https://dev.raspgot.fr/github/contact-form-recaptcha-v3/raspgot-blue.png)
+![logo](https://dev.raspgot.fr/github/contact-form-php/raspgot-blue.png)
 
 You can visit my [Portfolio](https://raspgot.fr) and star this repo if you like it 🤖
 
 ## Dependencies
 * [PHPMailer](https://github.com/PHPMailer/PHPMailer)
 * [reCAPTCHA PHP client library](https://github.com/google/recaptcha)
-* [Bootswatch](https://github.com/thomaspark/bootswatch) (Flaty)
+* [Bootstrap](https://getbootstrap.com)
 * [Jquery](https://github.com/jquery/jquery)
 * [jquery-validation](https://github.com/jquery-validation/jquery-validation)
