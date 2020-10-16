@@ -2,11 +2,9 @@
 <html lang="fr">
     <head>
         <meta charset="utf-8">
-        <meta name="description" content="Github AjaxContactForm">
-        <meta name="author" content="Raspgot">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/flatly/bootstrap.min.css">
-        <title>AjaxContactForm</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css">
+        <title>Contact-Form-PHP</title>
         <style>
             html,
             body {
@@ -26,18 +24,19 @@
                 padding: .8rem;
                 font-size: 16px;
             }
+            .form-control.is-valid, .was-validated .form-control:valid
+            .form-control.is-invalid, .was-validated .form-control:invalid {
+                background-image: none !important;
+            }
         </style>
     </head>
 
     <body class="text-center">
         <div class="form-signin shadow-lg rounded mx-auto py-4 px-5">
-            <h4 class="font-weight-bolder text-success">AjaxContactForm</h4>
-            <div class="my-3">
-                <a class="github-button" href="https://github.com/raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3" data-size="large" data-show-count="true" aria-label="Star raspgot/AjaxContactForm-PHPMailer-reCAPTCHA-v3 on GitHub">Star This !</a>
-            </div>
+            <h4 class="font-weight-bolder text-success mb-4">Contact-Form-PHP</h4>
             
             <!-- Form -->
-            <form action="AjaxForm.php" class="m-auto">
+            <form action="AjaxForm.php" method="post" class="m-auto" id="contactform">
                 <div class="form-group">
                     <input type="text" class="form-control" name="name" placeholder="Name">
                 </div>
@@ -45,13 +44,13 @@
                     <input type="email" class="form-control" name="email" placeholder="Email">
                 </div>
                 <div class="form-group">
-                    <textarea name="message" class="form-control" rows="6" placeholder="Your message"></textarea>
+                    <textarea name="message" class="form-control" rows="4" placeholder="Your message"></textarea>
                 </div>
-                <button type="submit" id="submit-btn" class="btn btn-primary btn-lg w-100">
-                    <div class="spinner-border spinner-border-sm mr-2 d-none" role="status">
+                <button type="submit" id="submit-btn" class="btn btn-primary w-100">
+                    <div class="spinner-border spinner-border-sm d-none" role="status">
                         <span class="sr-only">Loading...</span>
                     </div>
-                    SEND
+                    <span id="sendtext">SEND</span>
                 </button>
                 <!-- Token value | recaptcha -->
                 <input name="recaptcha-token" type="hidden">
@@ -73,10 +72,9 @@
             </div>
         </div>
 
-        <script async defer src="https://buttons.github.io/buttons.js"></script>
         <script src="https://www.google.com/recaptcha/api.js?render=GOOGLE_PUBLIC_KEY"></script>
         <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
         <script src="AjaxForm.js"></script>
     </body>
