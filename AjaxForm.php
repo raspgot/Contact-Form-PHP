@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Simple form using Ajax, validations, SMTP and reCAPTCHA v3 for PHP.
+ * Simple and secure contact form using Ajax, validations inputs, SMTP protocol and Google reCAPTCHA v3 in PHP.
  * 
  * @see      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
  * @package  PHPMailer | reCAPTCHA v3
  * @author   Gauthier Witkowski <contact@raspgot.fr>
  * @link     https://raspgot.fr
- * @version  1.0.3
+ * @version  1.0.4
  */
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -25,16 +25,17 @@ require __DIR__ . '/vendor/recaptcha/autoload.php';
 class Ajax_Form {
     
     # Constants to redefined
-    const HOST        = 'mail.infomaniak.com'; #SMTP server
-    const USERNAME    = ''; #SMTP username
-    const PASSWORD    = ''; #SMTP password
+    # Check this for more configurations: https://blog.mailtrap.io/phpmailer
+    const HOST        = ''; # SMTP server
+    const USERNAME    = ''; # SMTP username
+    const PASSWORD    = ''; # SMTP password
     const SMTP_SECURE = PHPMailer::ENCRYPTION_STARTTLS;
     const SMTP_AUTH   = true;
     const PORT        = 587;
-    const SECRET_KEY  = ''; #GOOGLE secret key
+    const SECRET_KEY  = ''; # GOOGLE secret key
     const SUBJECT     = 'New message !';
     public $handler   = [
-        'success'       => '✔️ Your message has been sent.',
+        'success'       => '✔️ Your message has been sent !',
         'token-error'   => '❌ Error recaptcha token.',
         'enter_name'    => '❌ Please enter your name.',
         'enter_email'   => '❌ Please enter a valid email.',
@@ -50,7 +51,7 @@ class Ajax_Form {
     ];
 
     /**
-     * Ajax_Form __constructor
+     * Ajax_Form constructor
      */
     public function __construct() {
 
@@ -60,12 +61,13 @@ class Ajax_Form {
         }
 
         # Check if fields has been entered and valid
-        # Get secure post data
-        $name    = !empty($_GET['name']) ? filter_var($this->secure($_GET['name']), FILTER_SANITIZE_STRING) : $this->statusHandler('enter_name');
-        $email   = !empty($_GET['email']) ? filter_var($this->secure($_GET['email']), FILTER_SANITIZE_EMAIL) : $this->statusHandler('enter_email');
-        $message = !empty($_GET['message']) ? filter_var($this->secure($_GET['message']), FILTER_SANITIZE_STRING) : $this->statusHandler('enter_message');
-        $token   = !empty($_GET['recaptcha-token']) ? filter_var($this->secure($_GET['recaptcha-token']), FILTER_SANITIZE_STRING) : $this->statusHandler('token-error');
-        $date    = new DateTime();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $name    = !empty($_POST['name']) ? filter_var($this->secure($_POST['name']), FILTER_SANITIZE_STRING) : $this->statusHandler('enter_name');
+            $email   = !empty($_POST['email']) ? filter_var($this->secure($_POST['email']), FILTER_SANITIZE_EMAIL) : $this->statusHandler('enter_email');
+            $message = !empty($_POST['message']) ? filter_var($this->secure($_POST['message']), FILTER_SANITIZE_STRING) : $this->statusHandler('enter_message');
+            $token   = !empty($_POST['recaptcha-token']) ? filter_var($this->secure($_POST['recaptcha-token']), FILTER_SANITIZE_STRING) : $this->statusHandler('token-error');
+            $date    = new DateTime();
+        }
 
         # Prepare body
         $body = $this->getString('body');
@@ -85,6 +87,7 @@ class Ajax_Form {
             
         if ($resp->isSuccess()) {
 
+            # Instance of PHPMailer
             $mail = new PHPMailer(true);
             $mail->setLanguage('en', __DIR__ . '/vendor/PHPMailer/language/');
 
@@ -112,6 +115,7 @@ class Ajax_Form {
                 $mail->Body    = $body;
                 $mail->AltBody = strip_tags($body);;
             
+                # Send email
                 $mail->send();
                 $this->statusHandler('success');
 
@@ -124,7 +128,7 @@ class Ajax_Form {
     }
 
     /**
-     * Template string
+     * Template string values
      *
      * @param string $string
      * @param array $vars
