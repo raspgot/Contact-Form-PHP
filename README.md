@@ -13,11 +13,11 @@ You can try this: https://dev.raspgot.fr/github/contact-form-php
 * Validation and inputs security (PHP and JS)
 
 ## Installation
-Use clone command or [direct download](https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA/archive/master.zip)
+Use clone command or [direct download](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip)
 
 ```shell
-git clone https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA.git
-cd AjaxForm-PHPMailer-reCAPTCHA
+git clone https://github.com/raspgot/Contact-Form-PHP.git
+cd Contact-Form-PHP
 php -S localhost:8000
 ```
 Or use [XAMMP](https://www.apachefriends.org)
