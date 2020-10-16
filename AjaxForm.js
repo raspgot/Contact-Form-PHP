@@ -1,9 +1,9 @@
 // .validate (https://jqueryvalidation.org)
-// .get (https://api.jquery.com/jQuery.get)
+// .post (https://api.jquery.com/jQuery.post/)
 // reCaptcha v3 (https://developers.google.com/recaptcha/docs/v3)
 // @author Raspgot
 
-const publicKey = ""; //GOOGLE public key
+const publicKey = ""; // GOOGLE public key
 
 // Get token from API
 function check_grecaptcha() {
@@ -16,9 +16,16 @@ function check_grecaptcha() {
     });
 }
 
-$(function() {
+// Show response in .toast
+function toastShowing(response) {
+    $(".toast-body").html(JSON.parse(response));
+    $(".toast").toast('show');
+}
+
+$(function () {
     check_grecaptcha();
-    $("form").validate({
+    $("#contactform").validate({
+        // Form fields rules
         rules: {
             name: {
                 required: true,
@@ -33,7 +40,7 @@ $(function() {
                 minlength: 5
             }
         },
-        // Customize your messages
+        // Error messages
         messages: {
             name: {
                 required: "Please enter your name.",
@@ -46,19 +53,22 @@ $(function() {
             }
         },
         errorClass: "invalid-feedback",
+        // Dynamic validation classes
         highlight: function (element) {
             $(element).addClass("is-invalid").removeClass("is-valid");
         },
         unhighlight: function (element) {
             $(element).addClass("is-valid").removeClass("is-invalid");
         },
+        // Action on submit
         submitHandler: function (form) {
             $(".spinner-border").removeClass("d-none");
-            $.get(form.action, $(form).serialize())
+            $("#sendtext").addClass("d-none");
+            $.post(form.action, $(form).serialize())
                 .done(function (response) {
-                    $(".toast-body").html(JSON.parse(response));
-                    $(".toast").toast('show');
+                    toastShowing((response));
                     $(".spinner-border").addClass("d-none");
+                    $("#sendtext").removeClass("d-none");
                     $("#submit-btn").prop("disabled", true);
                     check_grecaptcha();
                     setTimeout(function () {
@@ -70,9 +80,9 @@ $(function() {
                     }, 3000);
                 })
                 .fail(function (response) {
-                    $(".toast-body").html(JSON.parse(response));
-                    $(".toast").toast('show');
+                    toastShowing((response));
                     $(".spinner-border").addClass("d-none");
+                    $("#sendtext").removeClass("d-none");
                 });
         }
     });
