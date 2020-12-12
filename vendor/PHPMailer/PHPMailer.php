@@ -389,11 +389,11 @@ class PHPMailer
      * SMTP class debug output mode.
      * Debug output level.
      * Options:
-     * * SMTP::DEBUG_OFF: No output
-     * * SMTP::DEBUG_CLIENT: Client messages
-     * * SMTP::DEBUG_SERVER: Client and server messages
-     * * SMTP::DEBUG_CONNECTION: As SERVER plus connection status
-     * * SMTP::DEBUG_LOWLEVEL: Noisy, low-level data output, rarely needed
+     * @see SMTP::DEBUG_OFF: No output
+     * @see SMTP::DEBUG_CLIENT: Client messages
+     * @see SMTP::DEBUG_SERVER: Client and server messages
+     * @see SMTP::DEBUG_CONNECTION: As SERVER plus connection status
+     * @see SMTP::DEBUG_LOWLEVEL: Noisy, low-level data output, rarely needed
      *
      * @see SMTP::$do_debug
      *
@@ -748,7 +748,7 @@ class PHPMailer
      *
      * @var string
      */
-    const VERSION = '6.1.8';
+    const VERSION = '6.2.0';
 
     /**
      * Error severity: message only, continue processing.
@@ -1462,7 +1462,7 @@ class PHPMailer
     {
         if (
             'smtp' === $this->Mailer
-            || ('mail' === $this->Mailer && stripos(PHP_OS, 'WIN') === 0)
+            || ('mail' === $this->Mailer && (\PHP_VERSION_ID >= 80000 || stripos(PHP_OS, 'WIN') === 0))
         ) {
             //SMTP mandates RFC-compliant line endings
             //and it's also used with mail() on Windows
@@ -1474,8 +1474,8 @@ class PHPMailer
         //Check for buggy PHP versions that add a header with an incorrect line break
         if (
             'mail' === $this->Mailer
-            && ((PHP_VERSION_ID >= 70000 && PHP_VERSION_ID < 70017)
-                || (PHP_VERSION_ID >= 70100 && PHP_VERSION_ID < 70103))
+            && ((\PHP_VERSION_ID >= 70000 && \PHP_VERSION_ID < 70017)
+                || (\PHP_VERSION_ID >= 70100 && \PHP_VERSION_ID < 70103))
             && ini_get('mail.add_x_header') === '1'
             && stripos(PHP_OS, 'WIN') === 0
         ) {
@@ -4078,7 +4078,7 @@ class PHPMailer
                     continue;
                 }
                 if (
-// Only process relative URLs if a basedir is provided (i.e. no absolute local paths)
+                    // Only process relative URLs if a basedir is provided (i.e. no absolute local paths)
                     !empty($basedir)
                     // Ignore URLs containing parent dir traversal (..)
                     && (strpos($url, '..') === false)
@@ -4526,11 +4526,15 @@ class PHPMailer
             $privKey = openssl_pkey_get_private($privKeyStr);
         }
         if (openssl_sign($signHeader, $signature, $privKey, 'sha256WithRSAEncryption')) {
-            openssl_pkey_free($privKey);
+            if (\PHP_MAJOR_VERSION < 8) {
+                openssl_pkey_free($privKey);
+            }
 
             return base64_encode($signature);
         }
-        openssl_pkey_free($privKey);
+        if (\PHP_MAJOR_VERSION < 8) {
+            openssl_pkey_free($privKey);
+        }
 
         return '';
     }
