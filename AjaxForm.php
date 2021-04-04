@@ -7,7 +7,7 @@
  * @package  PHPMailer | reCAPTCHA v3
  * @author   Gauthier Witkowski <contact@raspgot.fr>
  * @link     https://raspgot.fr
- * @version  1.0.4
+ * @version  1.1.0
  */
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -23,61 +23,65 @@ require __DIR__ . '/vendor/PHPMailer/SMTP.php';
 require __DIR__ . '/vendor/recaptcha/autoload.php';
 
 class Ajax_Form {
-    
+
     # Constants to redefined
     # Check this for more configurations: https://blog.mailtrap.io/phpmailer
     const HOST        = ''; # SMTP server
     const USERNAME    = ''; # SMTP username
     const PASSWORD    = ''; # SMTP password
+    const SECRET_KEY  = ''; # GOOGLE secret key
     const SMTP_SECURE = PHPMailer::ENCRYPTION_STARTTLS;
     const SMTP_AUTH   = true;
     const PORT        = 587;
-    const SECRET_KEY  = ''; # GOOGLE secret key
     const SUBJECT     = 'New message !';
-    public $handler   = [
+    const HANDLER_MSG = [
         'success'       => '✔️ Your message has been sent !',
         'token-error'   => '❌ Error recaptcha token.',
         'enter_name'    => '❌ Please enter your name.',
         'enter_email'   => '❌ Please enter a valid email.',
         'enter_message' => '❌ Please enter your message.',
+        'bad_ip'        => '❌ 56k ?',
         'ajax_only'     => '❌ Asynchronous anonymous.',
-        'body'          => '
+        'email_body'    => '
             <h1>{{subject}}</h1>
-            <p><strong>Date :</strong> {{date}}</p>
-            <p><strong>Name :</strong> {{name}}</p>
-            <p><strong>E-Mail :</strong> {{email}}</p>
-            <p><strong>Message :</strong> {{message}}</p>
-        ',
+            <p><b>Date</b>: {{date}}</p>
+            <p><b>Name</b>: {{name}}</p>
+            <p><b>E-Mail</b>: {{email}}</p>
+            <p><b>Message</b>: {{message}}</p>
+            <p><b>IP</b>: {{ip}}</p>
+        '
     ];
 
     /**
      * Ajax_Form constructor
      */
-    public function __construct() {
-
+    public function __construct()
+    {
         # Check if request is Ajax request
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 'XMLHttpRequest' !== $_SERVER['HTTP_X_REQUESTED_WITH']) {
-            $this->statusHandler('ajax_only', 'error');
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] !== 'XMLHttpRequest') {
+            $this->statusHandler('ajax_only');
         }
 
         # Check if fields has been entered and valid
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name    = !empty($_POST['name']) ? filter_var($this->secure($_POST['name']), FILTER_SANITIZE_STRING) : $this->statusHandler('enter_name');
-            $email   = !empty($_POST['email']) ? filter_var($this->secure($_POST['email']), FILTER_SANITIZE_EMAIL) : $this->statusHandler('enter_email');
-            $message = !empty($_POST['message']) ? filter_var($this->secure($_POST['message']), FILTER_SANITIZE_STRING) : $this->statusHandler('enter_message');
-            $token   = !empty($_POST['recaptcha-token']) ? filter_var($this->secure($_POST['recaptcha-token']), FILTER_SANITIZE_STRING) : $this->statusHandler('token-error');
+            $name    = filter_var($this->secure($_POST['name']), FILTER_SANITIZE_STRING) ?? $this->statusHandler('enter_name');
+            $email   = filter_var($this->secure($_POST['email']), FILTER_SANITIZE_EMAIL) ?? $this->statusHandler('enter_email');
+            $message = filter_var($this->secure($_POST['message']), FILTER_SANITIZE_STRING) ?? $this->statusHandler('enter_message');
+            $token   = filter_var($this->secure($_POST['recaptcha-token']), FILTER_SANITIZE_STRING) ?? $this->statusHandler('token-error');
+            $ip      = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ?? $this->statusHandler('bad_ip');
             $date    = new DateTime();
         }
 
-        # Prepare body
-        $body = $this->getString('body');
-        $body = $this->template( $body, [
+        # Prepare email body
+        $email_body = self::HANDLER_MSG['email_body'];
+        $email_body = $this->template($email_body, [
             'subject' => self::SUBJECT,
             'date'    => $date->format('j/m/Y H:i:s'),
             'name'    => $name,
             'email'   => $email,
-            'message' => $message,
-        ] );
+            'ip'      => $ip,
+            'message' => $message
+        ]);
 
         # Verifying the user's response
         $recaptcha = new \ReCaptcha\ReCaptcha(self::SECRET_KEY);
@@ -86,8 +90,7 @@ class Ajax_Form {
             ->verify($token, $_SERVER['REMOTE_ADDR']);
             
         if ($resp->isSuccess()) {
-
-            # Instance of PHPMailer
+            # Instanciation of PHPMailer
             $mail = new PHPMailer(true);
             $mail->setLanguage('en', __DIR__ . '/vendor/PHPMailer/language/');
 
@@ -101,29 +104,29 @@ class Ajax_Form {
                 $mail->Password   = self::PASSWORD;    # SMTP password
                 $mail->SMTPSecure = self::SMTP_SECURE; # Enable TLS encryption, `ssl` also accepted
                 $mail->Port       = self::PORT;        # TCP port
-            
+
                 # Recipients
                 $mail->setFrom(self::USERNAME, 'Raspgot');
                 $mail->addAddress($email, $name);
                 $mail->AddCC(self::USERNAME, 'Dev_copy');
                 $mail->addReplyTo(self::USERNAME, 'Information');
-            
+
                 # Content
-                $mail->CharSet = 'UTF-8';
                 $mail->isHTML(true);
+                $mail->CharSet = 'UTF-8';
                 $mail->Subject = self::SUBJECT;
-                $mail->Body    = $body;
-                $mail->AltBody = strip_tags($body);;
-            
+                $mail->Body    = $email_body;
+                $mail->AltBody = strip_tags($email_body);
+
                 # Send email
                 $mail->send();
                 $this->statusHandler('success');
 
             } catch (Exception $e) {
-                die (json_encode( $mail->ErrorInfo ));
+                die(json_encode($mail->ErrorInfo));
             }
         } else {
-            die (json_encode( $resp->getErrorCodes() ));
+            die(json_encode($resp->getErrorCodes()));
         }
     }
 
@@ -134,23 +137,13 @@ class Ajax_Form {
      * @param array $vars
      * @return string
      */
-    public function template($string, $vars)
+    public function template(string $string, array $vars): string
     {
         foreach ($vars as $name => $val) {
             $string = str_replace("{{{$name}}}", $val, $string);
         }
-        return $string;
-    }
 
-    /**
-     * Get string from $string variable
-     *
-     * @param string $string
-     * @return string
-     */
-    public function getString($string)
-    {
-        return isset($this->handler[$string]) ? $this->handler[$string] : $string;
+        return $string;
     }
 
     /**
@@ -159,11 +152,12 @@ class Ajax_Form {
      * @param string $post
      * @return string
      */
-    public function secure($post)
+    public function secure(string $post): string
     {
         $post = htmlspecialchars($post);
         $post = stripslashes($post);
         $post = trim($post);
+
         return $post;
     }
 
@@ -171,12 +165,11 @@ class Ajax_Form {
      * Error or success message
      *
      * @param string $message
-     * @param string $status
      * @return json
      */
-    public function statusHandler($message)
+    public function statusHandler(string $message): json
     {
-        die (json_encode($this->getString($message)));
+        die(json_encode(self::HANDLER_MSG[$message]));
     }
 
 }
