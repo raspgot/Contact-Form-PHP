@@ -1,12 +1,13 @@
 # Contact-Form-PHP
-Simple and secure contact form using Ajax, validations inputs, SMTP protocol and Google reCAPTCHA v3 in PHP.
+Simple and secure bootstrap contact form using Ajax, validations inputs, SMTP protocol and Google reCAPTCHA v3 in PHP.
 
 ![raspgot](https://dev.raspgot.fr/github/contact-form-php/screen-form.png)
 
 ## Live Demo
-You can try this: https://dev.raspgot.fr/github/contact-form-php
+You can try this here: https://dev.raspgot.fr/github/contact-form-php
 
 ## Features
+* Boostrap 4
 * Ajax submission
 * Google reCAPTCHA v3
 * PHPMailer SMTP Authentication
@@ -31,12 +32,12 @@ More configurations examples &rarr; [HERE](https://github.com/PHPMailer/PHPMaile
 Timezones doc &rarr; [HERE](https://www.php.net/manual/fr/timezones.php)     
 
 ```php
-date_default_timezone_set('');     
+date_default_timezone_set(''); # your country     
 
-const HOST = ''; #SMTP server
-const USERNAME = ''; #SMTP username
-const PASSWORD = ''; #SMTP password
-const SECRET_KEY = ''; #GOOGLE secret key
+const HOST = ''; # SMTP server
+const USERNAME = ''; # SMTP username
+const PASSWORD = ''; # SMTP password
+const SECRET_KEY = ''; # GOOGLE secret key
 ```
 
 **AjaxForm.js**
