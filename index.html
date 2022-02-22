@@ -1,81 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
-        <title>Contact-Form-PHP</title>
-        <style>
-            html,
-            body {
-                height: 100%;
-            }
-            body {
-                display: flex;
-                align-items: center;
-                background-color: #f5f5f5;
-            }
-            .form-signin {
-                width: 100%;
-                max-width: 350px;
-            }
-            .form-signin .form-control {
-                height: auto;
-                padding: .8rem;
-                font-size: 16px;
-            }
-            .form-control.is-valid, .was-validated .form-control:valid
-            .form-control.is-invalid, .was-validated .form-control:invalid {
-                background-image: none !important;
-            }
-        </style>
-    </head>
 
-    <body class="text-center">
-        <div class="form-signin shadow-lg rounded mx-auto py-4 px-5">
-            <h4 class="font-weight-bolder text-success mb-4">Contact-Form-PHP</h4>
-            
-            <!-- Form -->
-            <form action="AjaxForm.php" method="post" class="m-auto" id="contactform">
-                <div class="form-group">
-                    <input type="text" class="form-control" name="name" placeholder="Name">
-                </div>
-                <div class="form-group">
-                    <input type="email" class="form-control" name="email" placeholder="Email">
-                </div>
-                <div class="form-group">
-                    <textarea name="message" class="form-control" rows="4" placeholder="Your message"></textarea>
-                </div>
-                <button type="submit" id="submit-btn" class="btn btn-primary w-100">
-                    <div class="spinner-border spinner-border-sm d-none" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                    <span id="sendtext">SEND</span>
-                </button>
-                <!-- Token value | recaptcha -->
-                <input name="recaptcha-token" type="hidden">
-            </form>
-            
-            <!-- Alert status -->
-            <div role="alert" aria-live="assertive" aria-atomic="true" class="toast fixed-top m-3" data-delay="8000">
-                <div class="toast-header">
-                    <svg class=" rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
-                        <rect fill="#C4CBF5" width="100%" height="100%" />
-                    </svg>
-                    <strong class="mr-auto">Admin</strong>
-                    <small>Now</small>
-                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="toast-body"></div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <title>Contact-Form-PHP</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+        }
+
+        #response-alert {
+            max-width: 350px;
+        }
+
+        @media screen and (min-width: 768px) {
+            #response-alert {
+                max-width: 650px;
+            }
+        }
+
+        .form-signin {
+            width: 100%;
+            max-width: 350px;
+            background-color: #ffffff;
+        }
+
+        .form-signin .form-control {
+            height: auto;
+            padding: .8rem;
+            font-size: 16px;
+        }
+
+        .form-control.is-valid, .was-validated .form-control:valid 
+        .form-control.is-invalid, .was-validated .form-control:invalid {
+            background-image: none !important;
+        }
+    </style>
+</head>
+
+<body class="text-center">
+    <!-- Alert status -->
+    <div class="alert alert-success fixed-top mx-auto mt-3 d-none" id="response-alert" role="alert"></div>
+    <div class="form-signin shadow-lg rounded-3 mx-auto py-4 px-5">
+        <h1 class="fs-3 text-success mb-4">Contact-Form-PHP</h1>
+
+        <!-- Form -->
+        <form action="AjaxForm.php" method="post" class="m-auto" id="contactform">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" name="name" placeholder="Name">
             </div>
-        </div>
+            <div class="input-group mb-3">
+                <input type="email" class="form-control" name="email" placeholder="Email">
+            </div>
+            <div class="input-group mb-3">
+                <textarea name="message" class="form-control" rows="4" placeholder="Message"></textarea>
+            </div>
+            <button type="submit" id="submit-btn" class="btn btn-lg btn-primary w-100">
+                <div class="spinner-border text-light d-none" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <span id="sendtext">SEND</span>
+            </button>
+            <!-- Give a star (you can delete for your own utilisation) -->
+            <div class="text-end mt-3">
+                <a class="github-button" href="https://github.com/raspgot/Contact-Form-PHP" data-icon="octicon-star"
+                    data-size="large" data-show-count="true" aria-label="Star raspgot/Contact-Form-PHP on GitHub">Star</a>
+            </div>
+            <!-- Token value | recaptcha -->
+            <input name="recaptcha-token" type="hidden">
+        </form>
+    </div>
 
-        <script src="https://www.google.com/recaptcha/api.js?render=GOOGLE_PUBLIC_KEY"></script>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
-        <script src="AjaxForm.js"></script>
-    </body>
+    <script src="https://www.google.com/recaptcha/api.js?render=6Leffq4UAAAAAKLIsZ4HLYVmrC3okzORHiAlObYe"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="AjaxForm.js"></script>
+    <!-- 4 Github widget -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+</body>
+
 </html>

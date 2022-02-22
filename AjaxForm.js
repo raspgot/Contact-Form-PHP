@@ -16,10 +16,11 @@ function check_grecaptcha() {
     });
 }
 
-// Show response in .toast
-function toastShowing(response) {
-    $(".toast-body").html(JSON.parse(response));
-    $(".toast").toast('show');
+// Show response in .alert
+function alertShowing(response) {
+    $("#response-alert").html(JSON.parse(response));
+    $("#response-alert").removeClass("d-none");
+    $("#response-alert").addClass("d-block");
 }
 
 $(function () {
@@ -66,7 +67,7 @@ $(function () {
             $("#sendtext").addClass("d-none");
             $.post(form.action, $(form).serialize())
                 .done(function (response) {
-                    toastShowing((response));
+                    alertShowing((response));
                     $(".spinner-border").addClass("d-none");
                     $("#sendtext").removeClass("d-none");
                     $("#submit-btn").prop("disabled", true);
@@ -80,7 +81,7 @@ $(function () {
                     }, 3000);
                 })
                 .fail(function (response) {
-                    toastShowing((response));
+                    alertShowing((response));
                     $(".spinner-border").addClass("d-none");
                     $("#sendtext").removeClass("d-none");
                 });
