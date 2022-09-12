@@ -64,10 +64,10 @@ class Ajax_Form {
 
         # Check if fields has been entered and valid
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name    = filter_var($this->secure($_POST['name']), FILTER_SANITIZE_STRING) ?? $this->statusHandler('enter_name');
+            $name    = $this->secure($_POST['name']) ?? $this->statusHandler('enter_name');
             $email   = filter_var($this->secure($_POST['email']), FILTER_SANITIZE_EMAIL) ?? $this->statusHandler('enter_email');
-            $message = filter_var($this->secure($_POST['message']), FILTER_SANITIZE_STRING) ?? $this->statusHandler('enter_message');
-            $token   = filter_var($this->secure($_POST['recaptcha-token']), FILTER_SANITIZE_STRING) ?? $this->statusHandler('token-error');
+            $message = $this->secure($_POST['message']) ?? $this->statusHandler('enter_message');
+            $token   = $this->secure($_POST['recaptcha-token']) ?? $this->statusHandler('token-error');
             $ip      = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ?? $this->statusHandler('bad_ip');
             $date    = new DateTime();
         }
@@ -154,7 +154,7 @@ class Ajax_Form {
      */
     public function secure(string $post): string
     {
-        $post = htmlspecialchars($post);
+        $post = htmlspecialchars($post, ENT_QUOTES);
         $post = stripslashes($post);
         $post = trim($post);
 
