@@ -23,7 +23,6 @@ require __DIR__ . '/vendor/PHPMailer/SMTP.php';
 require __DIR__ . '/vendor/recaptcha/autoload.php';
 
 class Ajax_Form {
-
     # Constants to redefined
     # Check this for more configurations: https://blog.mailtrap.io/phpmailer
     const HOST        = ''; # SMTP server
@@ -88,7 +87,7 @@ class Ajax_Form {
         $resp = $recaptcha
             ->setExpectedHostname($_SERVER['SERVER_NAME'])
             ->verify($token, $_SERVER['REMOTE_ADDR']);
-            
+
         if ($resp->isSuccess()) {
             # Instanciation of PHPMailer
             $mail = new PHPMailer(true);
@@ -165,13 +164,12 @@ class Ajax_Form {
      * Error or success message
      *
      * @param string $message
-     * @return json
+     * @return string
      */
-    public function statusHandler(string $message): json
+    public function statusHandler(string $message): string
     {
         die(json_encode(self::HANDLER_MSG[$message]));
     }
-
 }
 
 # Instanciation 
