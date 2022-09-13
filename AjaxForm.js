@@ -1,7 +1,9 @@
-// .validate (https://jqueryvalidation.org)
-// .post (https://api.jquery.com/jQuery.post/)
-// reCaptcha v3 (https://developers.google.com/recaptcha/docs/v3)
-// @author Raspgot
+/**
+ * .validate (https://jqueryvalidation.org)
+ * .post (https://api.jquery.com/jQuery.post/)
+ * reCaptcha v3 (https://developers.google.com/recaptcha/docs/v3)
+ * @author Raspgot
+ */
 
 const publicKey = ""; // GOOGLE public key
 
@@ -25,6 +27,7 @@ function alertShowing(response) {
 
 $(function () {
     check_grecaptcha();
+    // If you add field, add rule and error message in validate function
     $("#contactform").validate({
         // Form fields rules
         rules: {
@@ -56,9 +59,11 @@ $(function () {
         errorClass: "invalid-feedback",
         // Dynamic validation classes
         highlight: function (element) {
+            // Invalid
             $(element).addClass("is-invalid").removeClass("is-valid");
         },
         unhighlight: function (element) {
+            // Valid
             $(element).addClass("is-valid").removeClass("is-invalid");
         },
         // Action on submit
@@ -72,13 +77,15 @@ $(function () {
                     $("#sendtext").removeClass("d-none");
                     $("#submit-btn").prop("disabled", true);
                     check_grecaptcha();
+
+                    // Timeout to reset form
                     setTimeout(function () {
                         $("#submit-btn").prop("disabled", false);
                         $("form").trigger("reset");
                         $("form").each(function () {
                             $(this).find(".form-control").removeClass("is-valid")
                         })
-                    }, 3000);
+                    }, 2000);
                 })
                 .fail(function (response) {
                     alertShowing((response));
