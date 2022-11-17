@@ -1,5 +1,5 @@
 # Contact-Form-PHP
-Simple and secure bootstrap contact form using Ajax, validations inputs, SMTP protocol and Google reCAPTCHA v3 in PHP.
+Simple, customizable and secure bootstrap contact form using Ajax, validations inputs, SMTP protocol and Google reCAPTCHA v3.
 
 ![](https://dev.raspgot.fr/github/contact-form-php/gif_github.gif)
 
@@ -7,12 +7,12 @@ Simple and secure bootstrap contact form using Ajax, validations inputs, SMTP pr
 You can try this here: https://dev.raspgot.fr/github/contact-form-php
 
 ## Features
-* PHP 8.1
-* Bootstrap 5
+* PHP 8.1 [(reference)](https://www.php.net/supported-versions.php)
+* Bootstrap 5.2
 * Ajax submission
 * Google reCAPTCHA v3
 * PHPMailer SMTP Authentication
-* Validation and inputs security (PHP and JS)
+* Validation and inputs security (PHP & JS)
 
 ## Installation
 Use clone command or [direct download](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip)
