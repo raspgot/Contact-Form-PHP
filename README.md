@@ -1,9 +1,9 @@
 # Contact-Form-PHP
 
-![version](https://img.shields.io/badge/version-1.1.0-blue.svg) ![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP) [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)          
+![version](https://img.shields.io/badge/version-1.2.0-blue.svg) ![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP) [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)          
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
 
-Simple, customizable and secure bootstrap contact form using Ajax, validations inputs, SMTP protocol and Google reCAPTCHA v3.
+Simple, customizable and secure bootstrap contact form using Ajax, validations inputs, SMTP protocol, rejected domain not found and Google reCAPTCHA v3.
 
 ![](https://dev.raspgot.fr/github/contact-form-php/gif_github.gif)
 
