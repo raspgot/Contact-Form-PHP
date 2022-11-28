@@ -20,7 +20,16 @@ function check_grecaptcha() {
 
 // Show response in .alert
 function alertShowing(response) {
-    $("#response-alert").html(JSON.parse(response));
+    // Apply class alert
+    if (response.error == true) {
+        $("#response-alert").addClass("alert-danger");
+        $("#response-alert").removeClass("alert-success");
+    } else {
+        $("#response-alert").addClass("alert-success");
+        $("#response-alert").removeClass("alert-danger");
+    }
+    // Display alert with message
+    $("#response-alert").html(response.message);
     $("#response-alert").removeClass("d-none");
     $("#response-alert").addClass("d-block");
 }
@@ -72,7 +81,7 @@ $(function () {
             $("#sendtext").addClass("d-none");
             $.post(form.action, $(form).serialize())
                 .done(function (response) {
-                    alertShowing((response));
+                    alertShowing(JSON.parse(response));
                     $(".spinner-border").addClass("d-none");
                     $("#sendtext").removeClass("d-none");
                     $("#submit-btn").prop("disabled", true);
@@ -88,9 +97,7 @@ $(function () {
                     }, 2000);
                 })
                 .fail(function (response) {
-                    alertShowing((response));
-                    $(".spinner-border").addClass("d-none");
-                    $("#sendtext").removeClass("d-none");
+                    alert(response);
                 });
         }
     });

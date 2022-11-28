@@ -29,7 +29,7 @@ const USERNAME    = ''; # SMTP username
 const PASSWORD    = ''; # SMTP password
 const SECRET_KEY  = ''; # GOOGLE secret key
 const SMTP_SECURE = PHPMailer::ENCRYPTION_STARTTLS;
-const SMTP_AUTH   = false;
+const SMTP_AUTH   = true;
 const PORT        = 587;
 const SUBJECT     = 'New message !';
 const HANDLER_MSG = [
@@ -52,16 +52,16 @@ const HANDLER_MSG = [
 
 # Check if request is Ajax request
 if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] !== 'XMLHttpRequest') {
-    statusHandler(HANDLER_MSG['ajax_only']);
+    statusHandler(true, HANDLER_MSG['ajax_only']);
 }
 
 # Check if fields has been entered and valid
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name    = secure($_POST['name']) ?? statusHandler(HANDLER_MSG['enter_name']);
-    $email   = filter_var(secure($_POST['email']), FILTER_SANITIZE_EMAIL) ?? statusHandler(HANDLER_MSG['enter_email']);
-    $message = secure($_POST['message']) ?? statusHandler(HANDLER_MSG['enter_message']);
-    $token   = secure($_POST['recaptcha-token']) ?? statusHandler(HANDLER_MSG['token-error']);
-    $ip      = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ?? statusHandler(HANDLER_MSG['bad_ip']);
+    $name    = secure($_POST['name']) ?? statusHandler(true, HANDLER_MSG['enter_name']);
+    $email   = filter_var(secure($_POST['email']), FILTER_SANITIZE_EMAIL) ?? statusHandler(true, HANDLER_MSG['enter_email']);
+    $message = secure($_POST['message']) ?? statusHandler(true, HANDLER_MSG['enter_message']);
+    $token   = secure($_POST['recaptcha-token']) ?? statusHandler(true, HANDLER_MSG['token-error']);
+    $ip      = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ?? statusHandler(true, HANDLER_MSG['bad_ip']);
     $date    = new DateTime();
 }
 
@@ -92,11 +92,11 @@ if ($resp->isSuccess()) {
         $mail->SMTPDebug  = SMTP::DEBUG_OFF; # Enable verbose debug output
         $mail->isSMTP();                     # Set mailer to use SMTP
         $mail->Host       = HOST;            # Specify main and backup SMTP servers
+        $mail->Port       = PORT;            # TCP port
         $mail->SMTPAuth   = SMTP_AUTH;       # Enable SMTP authentication
         $mail->Username   = USERNAME;        # SMTP username
         $mail->Password   = PASSWORD;        # SMTP password
         $mail->SMTPSecure = SMTP_SECURE;     # Enable TLS encryption, `ssl` also accepted
-        $mail->Port       = PORT;            # TCP port
 
         # Recipients
         $mail->setFrom(USERNAME, 'Raspgot');
@@ -113,13 +113,13 @@ if ($resp->isSuccess()) {
 
         # Send email
         $mail->send();
-        statusHandler(HANDLER_MSG['success']);
+        statusHandler(false, HANDLER_MSG['success']);
 
     } catch (Exception $e) {
-        statusHandler($mail->ErrorInfo);
+        statusHandler(true, $mail->ErrorInfo);
     }
 } else {
-    statusHandler($resp->getErrorCodes());
+    statusHandler(true, $resp->getErrorCodes());
 }
 
 /**
@@ -159,7 +159,10 @@ function secure(string $post): string
  * @param [type] $message
  * @return string
  */
-function statusHandler($message): string
+function statusHandler(bool $error, $message): string
 {
-    die(json_encode($message));
+    die(json_encode([
+        'error'   => $error,
+        'message' => $message
+    ]));
 }
