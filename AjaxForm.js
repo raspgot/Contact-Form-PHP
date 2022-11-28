@@ -7,35 +7,9 @@
 
 const publicKey = ""; // GOOGLE public key
 
-// Get token from API
-function check_grecaptcha() {
-    grecaptcha.ready(function () {
-        grecaptcha.execute(publicKey, {
-            action: "ajaxForm"
-        }).then(function (token) {
-            $("[name='recaptcha-token']").val(token);
-        });
-    });
-}
-
-// Show response in .alert
-function alertShowing(response) {
-    // Apply class alert
-    if (response.error == true) {
-        $("#response-alert").addClass("alert-danger");
-        $("#response-alert").removeClass("alert-success");
-    } else {
-        $("#response-alert").addClass("alert-success");
-        $("#response-alert").removeClass("alert-danger");
-    }
-    // Display alert with message
-    $("#response-alert").html(response.message);
-    $("#response-alert").removeClass("d-none");
-    $("#response-alert").addClass("d-block");
-}
-
 $(function () {
     check_grecaptcha();
+
     // If you add field, add rule and error message in validate function
     $("#contactform").validate({
         // Form fields rules
@@ -76,17 +50,20 @@ $(function () {
             $(element).addClass("is-valid").removeClass("is-invalid");
         },
         // Action on submit
-        submitHandler: function (form) {
-            $(".spinner-border").removeClass("d-none");
-            $("#sendtext").addClass("d-none");
+        submitHandler: function (form, event) {
+            event.preventDefault();
+            $("#sendtext").text("SENDING...");
             $.post(form.action, $(form).serialize())
                 .done(function (response) {
                     alertShowing(JSON.parse(response));
-                    $(".spinner-border").addClass("d-none");
-                    $("#sendtext").removeClass("d-none");
+                    $("#sendtext").text("SEND");
                     $("#submit-btn").prop("disabled", true);
                     check_grecaptcha();
-
+                })
+                .fail(function (response) {
+                    alert(response);
+                })
+                .always(function () {
                     // Timeout to reset form
                     setTimeout(function () {
                         $("#submit-btn").prop("disabled", false);
@@ -94,11 +71,35 @@ $(function () {
                         $("form").each(function () {
                             $(this).find(".form-control").removeClass("is-valid")
                         })
-                    }, 2000);
-                })
-                .fail(function (response) {
-                    alert(response);
+                    }, 3000);
                 });
         }
     });
 });
+
+// Get token from API
+function check_grecaptcha() {
+    grecaptcha.ready(function () {
+        grecaptcha.execute(publicKey, {
+            action: "ajaxForm"
+        }).then(function (token) {
+            $("[name='recaptcha-token']").val(token);
+        });
+    });
+}
+
+// Show response in .alert
+function alertShowing(response) {
+    // Apply class alert
+    if (response.error == true) {
+        $("#response-alert").addClass("alert-danger");
+        $("#response-alert").removeClass("alert-success");
+    } else {
+        $("#response-alert").addClass("alert-success");
+        $("#response-alert").removeClass("alert-danger");
+    }
+    // Display alert with message
+    $("#response-alert").html(response.message);
+    $("#response-alert").removeClass("d-none");
+    $("#response-alert").addClass("d-block");
+}

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Simple and secure contact form using Ajax, validations inputs, SMTP protocol and Google reCAPTCHA v3 in PHP.
+ * Simple, customizable and secure bootstrap contact form using Ajax, validations inputs, SMTP protocol, rejected domain not found and Google reCAPTCHA v3.
  * 
  * @see      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
  * @package  PHPMailer | reCAPTCHA v3
  * @author   Gauthier Witkowski <contact@raspgot.fr>
  * @link     https://raspgot.fr
- * @version  1.1.0
+ * @version  1.2.0
  */
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -38,7 +38,6 @@ const HANDLER_MSG = [
     'enter_name'    => '❌ Please enter your name.',
     'enter_email'   => '❌ Please enter a valid email.',
     'enter_message' => '❌ Please enter your message.',
-    'bad_ip'        => '❌ 56k ?',
     'ajax_only'     => '❌ Asynchronous anonymous.',
     'email_body'    => '
         <h1>{{subject}}</h1>
@@ -61,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email   = filter_var(secure($_POST['email']), FILTER_SANITIZE_EMAIL) ?? statusHandler(true, HANDLER_MSG['enter_email']);
     $message = secure($_POST['message']) ?? statusHandler(true, HANDLER_MSG['enter_message']);
     $token   = secure($_POST['recaptcha-token']) ?? statusHandler(true, HANDLER_MSG['token-error']);
-    $ip      = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ?? statusHandler(true, HANDLER_MSG['bad_ip']);
+    $ip      = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ?? 'not displayed';
     $date    = new DateTime();
 }
 
