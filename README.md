@@ -55,6 +55,8 @@ const publicKey = ''; // GOOGLE public key
 <script src="https://www.google.com/recaptcha/api.js?render=GOOGLE_PUBLIC_KEY"></script>
 ```
 
+YOU MUST ALLOW `allow_url_fopen` PARAMETER ON YOUR OWN SERVER
+
 ## Author
 ![logo](https://dev.raspgot.fr/github/contact-form-php/raspgot-blue.png)
 
