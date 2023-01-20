@@ -123,7 +123,6 @@ if ($resp->isSuccess()) {
 
 /**
  * Template string values
- *
  * @param string $string
  * @param array $vars
  * @return string
@@ -139,7 +138,6 @@ function template(string $string, array $vars): string
 
 /**
  * Secure inputs fields
- *
  * @param string $post
  * @return string
  */
@@ -154,8 +152,8 @@ function secure(string $post): string
 
 /**
  * Error or success message
- *
- * @param [type] $message
+ * @param bool $error
+ * @param mixed $message
  * @return string
  */
 function statusHandler(bool $error, $message): string
