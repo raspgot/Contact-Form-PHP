@@ -3,16 +3,17 @@
 ![version](https://img.shields.io/badge/version-1.2.0-blue.svg) ![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP) [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)          
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
 
-Simple, customizable and secure bootstrap contact form using Ajax, validations inputs, SMTP protocol, rejected domain not found and Google reCAPTCHA v3.
+Basic, simple and secure bootstrap contact form.     
+Using Ajax protocol, PHP & JS validations inputs, SMTP mail sending, rejected not found domain and Google reCAPTCHA v3.
 
 ![](https://dev.raspgot.fr/github/contact-form-php/gif_github_1.2.0.gif)
 
 ## Live Demo
-You can try this here: https://dev.raspgot.fr/github/contact-form-php
+You can try this form here: https://dev.raspgot.fr/github/contact-form-php
 
 ## Features
-* PHP 8.2 [(reference)](https://www.php.net/supported-versions.php)
-* Bootstrap 5.2
+* PHP 8.2.1 ✔️ [(See supported versions)](https://www.php.net/supported-versions.php)
+* Bootstrap 4.X/5.X
 * Ajax submission
 * Google reCAPTCHA v3
 * PHPMailer SMTP Authentication
@@ -26,12 +27,12 @@ git clone https://github.com/raspgot/Contact-Form-PHP.git
 cd Contact-Form-PHP
 php -S localhost:8000
 ```
-Or use [XAMMP](https://www.apachefriends.org)
+Or use [Laragon](https://laragon.org) / [XAMMP](https://www.apachefriends.org)
 
 ## Configuration
 SMTP sender &rarr; [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)     
 GOOGLE keys &rarr; [HERE](https://www.google.com/recaptcha/intro/v3.html)     
-More configurations examples &rarr; [HERE](https://github.com/PHPMailer/PHPMailer/tree/master/examples)
+More PHPMailer configurations &rarr; [HERE](https://github.com/PHPMailer/PHPMailer/tree/master/examples)
 
 **AjaxForm.php**     
 Timezones doc &rarr; [HERE](https://www.php.net/manual/fr/timezones.php)     
@@ -55,7 +56,7 @@ const publicKey = ''; // GOOGLE public key
 <script src="https://www.google.com/recaptcha/api.js?render=GOOGLE_PUBLIC_KEY"></script>
 ```
 
-YOU MUST ALLOW `allow_url_fopen` PARAMETER ON YOUR OWN SERVER
+YOU MUST ALLOW `allow_url_fopen` DIRECTIVE ON YOUR SERVER IN `php.ini`
 
 ## Author
 ![logo](https://dev.raspgot.fr/github/contact-form-php/raspgot-blue.png)
@@ -65,6 +66,6 @@ You can visit my [Portfolio](https://raspgot.fr) and star this repo if you like 
 ## Dependencies
 * [PHPMailer](https://github.com/PHPMailer/PHPMailer)
 * [reCAPTCHA PHP client library](https://github.com/google/recaptcha)
-* [Bootstrap](https://getbootstrap.com)
+* [Bootstrap](https://github.com/twbs/bootstrap)
 * [Jquery](https://github.com/jquery/jquery)
 * [jquery-validation](https://github.com/jquery-validation/jquery-validation)
