@@ -37,7 +37,6 @@ namespace ReCaptcha;
 /**
  * reCAPTCHA client.
  */
-#[\AllowDynamicProperties]
 class ReCaptcha
 {
     /**
@@ -123,6 +122,12 @@ class ReCaptcha
      * @var RequestMethod
      */
     private $requestMethod;
+
+    private $hostname;
+    private $apkPackageName;
+    private $action;
+    private $threshold;
+    private $timeoutSeconds;
 
     /**
      * Create a configured instance to use the reCAPTCHA service.
