@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email   = filter_var(secure($_POST['email']), FILTER_SANITIZE_EMAIL) ?? statusHandler(true, HANDLER_MSG['enter_email']);
     $message = secure($_POST['message']) ?? statusHandler(true, HANDLER_MSG['enter_message']);
     $token   = secure($_POST['recaptcha-token']) ?? statusHandler(true, HANDLER_MSG['token-error']);
-    $ip      = filter_var($_SERVER['HTTP_CF_CONNECTING_IP'], FILTER_VALIDATE_IP) ?? filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
+    $ip      = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'];
     $date    = new DateTime();
 }
 
@@ -71,7 +71,7 @@ $email_body = template($email_body, [
     'date'    => $date->format('j/m/Y H:i:s'),
     'name'    => $name,
     'email'   => $email,
-    'ip'      => $ip,
+    'ip'      => filter_var($ip, FILTER_VALIDATE_IP),
     'message' => $message
 ]);
 
@@ -79,7 +79,7 @@ $email_body = template($email_body, [
 $recaptcha = new \ReCaptcha\ReCaptcha(SECRET_KEY);
 $resp = $recaptcha
     ->setExpectedHostname($_SERVER['SERVER_NAME'])
-    ->verify($token, $ip);
+    ->verify($token, filter_var($ip, FILTER_VALIDATE_IP));
 
 if ($resp->isSuccess()) {
     # Instanciation of PHPMailer

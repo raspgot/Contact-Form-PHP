@@ -1,9 +1,10 @@
 # Contact-Form-PHP
 
-![version](https://img.shields.io/badge/version-1.2.0-blue.svg) ![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP) [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)          
+![version](https://img.shields.io/badge/version-1.3.0-blue.svg) ![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP) [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)          
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
 
 Basic, simple and secure bootstrap contact form.     
+Jquery FREE.     
 Using Ajax protocol, PHP & JS validations inputs, SMTP mail sending, rejected not found domain and Google reCAPTCHA v3.
 
 ![](https://dev.raspgot.fr/github/contact-form-php/gif_github_1.2.0.gif)
@@ -13,7 +14,7 @@ You can try this form here: https://dev.raspgot.fr/github/contact-form-php
 
 ## Features
 * PHP 8.2.3 ✔️ [(See supported versions)](https://www.php.net/supported-versions.php)
-* Bootstrap 4.X/5.X
+* Bootstrap 5.X
 * Ajax submission
 * Google reCAPTCHA v3
 * PHPMailer SMTP Authentication
@@ -48,12 +49,17 @@ const SECRET_KEY = ''; # GOOGLE secret key
 
 **AjaxForm.js**
 ```javascript
-const publicKey = ''; // GOOGLE public key
+const publicKey = 'GOOGLE_PUBLIC_KEY';
 ```
 
 **index.html**
 ```html
 <script src="https://www.google.com/recaptcha/api.js?render=GOOGLE_PUBLIC_KEY"></script>
+```
+You can cuztomise text error:
+```html
+<div class="valid-feedback">Name looks good</div>
+<div class="invalid-feedback">Please provide a valid name</div>
 ```
 
 YOU MUST ALLOW `allow_url_fopen` DIRECTIVE ON YOUR SERVER IN `php.ini`
@@ -67,5 +73,3 @@ You can visit my [Portfolio](https://raspgot.fr) and star this repo if you like 
 * [PHPMailer](https://github.com/PHPMailer/PHPMailer)
 * [reCAPTCHA PHP client library](https://github.com/google/recaptcha)
 * [Bootstrap](https://github.com/twbs/bootstrap)
-* [Jquery](https://github.com/jquery/jquery)
-* [jquery-validation](https://github.com/jquery-validation/jquery-validation)

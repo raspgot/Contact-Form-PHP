@@ -1,109 +1,73 @@
 /**
- * .validate (https://jqueryvalidation.org)
- * .post (https://api.jquery.com/jQuery.post/)
- * reCaptcha v3 (https://developers.google.com/recaptcha/docs/v3)
+ * .checkValidity | https://getbootstrap.com/docs/5.3/forms/validation
+ * FormData | https://developer.mozilla.org/en-US/docs/Web/API/FormData
+ * fetch | https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+ * reCaptcha v3 | https://developers.google.com/recaptcha/docs/v3
+ * 
  * @author Raspgot
  */
 
-const publicKey = ''; // GOOGLE public key
+const publicKey = 'GOOGLE_PUBLIC_KEY'; // GOOGLE public key
 
-$(function () {
-    check_grecaptcha();
+onload = () => {
+    'use strict'
 
-    // If you add field, add rule and error message in validate function
-    $('#contactform').validate({
-        // Form fields rules
-        rules: {
-            name: {
-                required: true,
-                minlength: 3,
-            },
-            email: {
-                required: true,
-                email: true,
-            },
-            message: {
-                required: true,
-                minlength: 5,
-            },
-        },
-        // Error messages
-        messages: {
-            name: {
-                required: 'Please enter your name.',
-                minlength: 'Must be at least 3 characters long.',
-            },
-            email: 'Please enter a valid email.',
-            message: {
-                required: 'Please enter your message.',
-                minlength: 'Must be at least 5 characters long.',
-            },
-        },
-        errorClass: 'invalid-feedback',
-        // Dynamic validation classes
-        highlight: function (element) {
-            // Invalid
-            $(element).addClass('is-invalid').removeClass('is-valid');
-        },
-        unhighlight: function (element) {
-            // Valid
-            $(element).addClass('is-valid').removeClass('is-invalid');
-        },
-        // Action on submit
-        submitHandler: function (form, event) {
-            event.preventDefault();
-            $('#sendtext').text('SENDING...');
-            $.post(form.action, $(form).serialize())
-                .done(function (response) {
-                    alertShowing(JSON.parse(response));
-                    $('#sendtext').text('SEND');
-                    $('#submit-btn').prop('disabled', true);
-                    check_grecaptcha();
-                })
-                .fail(function (response) {
-                    alert(response);
-                })
-                .always(function () {
-                    // Timeout to reset form
+    checkRecaptcha();
+
+    let forms = document.querySelectorAll('.needs-validation');
+    let spinner = document.getElementById('loading-spinner');
+
+    Array.prototype.filter.call(forms, function (form) {
+        form.addEventListener('submit', function (event) {
+            if (form.checkValidity() === false) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+            if (form.checkValidity() === true) {
+                event.preventDefault();
+                form.classList.remove('was-validated');
+                spinner.classList.remove('d-none');
+
+                let data = new FormData(form);
+                let alertClass = 'alert-danger';
+
+                fetch('AjaxForm.php', {
+                    method: 'post',
+                    body: data
+                }).then((data) => {
+                    return data.text();
+                }).then((txt) => {
+                    txt = JSON.parse(txt);
+                    if (txt.error === false) {
+                        alertClass = 'alert-success';
+                    }
+                    let alertBox = '<div class="alert ' + alertClass + '">' + txt.message + '</div>';
+                    if (alertClass && txt) {
+                        form.querySelector('#alert-statut').insertAdjacentHTML('beforeend', alertBox);
+                        form.reset();
+                        checkRecaptcha();
+                    }
+                    spinner.classList.add('d-none');
                     setTimeout(function () {
-                        $('#submit-btn').prop('disabled', false);
-                        $('form').trigger('reset');
-                        $('form').each(function () {
-                            $(this)
-                                .find('.form-control')
-                                .removeClass('is-valid');
-                        });
-                    }, 3000);
+                        form.querySelector('#alert-statut').innerHTML = '';
+                    }, 5000);
+                }).catch((err) => {
+                    console.log('Error encountered: ' + err);
+                    spinner.classList.add('d-none');
                 });
-        },
+            }
+        }, false);
     });
-});
+};
 
-// Get token from API
-function check_grecaptcha() {
+var checkRecaptcha = () => {
     grecaptcha.ready(function () {
-        grecaptcha
-            .execute(publicKey, {
-                action: 'ajaxForm',
-            })
-            .then(function (token) {
-                $("[name='recaptcha-token']").val(token);
-            });
+        grecaptcha.execute(publicKey, {
+            action: 'submit'
+        }).then(function (token) {
+            // input with recaptcha-token name take the recaptcha token value
+            document.getElementsByName('recaptcha-token')[0].value = token;
+        });
     });
-}
-
-// Show response in .alert
-function alertShowing(response) {
-    // Apply class alert
-    if (response.error == true) {
-        $('#response-alert').addClass('alert-danger');
-        $('#response-alert').removeClass('alert-success');
-    } else {
-        $('#response-alert').addClass('alert-success');
-        $('#response-alert').removeClass('alert-danger');
-    }
-    // Display alert with message
-    $('#response-alert').html(response.message);
-    $('#response-alert').removeClass('d-none');
-    $('#response-alert').addClass('d-block');
-}
+};
