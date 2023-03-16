@@ -7,7 +7,7 @@
  * @package  PHPMailer | reCAPTCHA v3
  * @author   Gauthier Witkowski <contact@raspgot.fr>
  * @link     https://raspgot.fr
- * @version  1.2.0
+ * @version  1.3.0
  */
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -20,7 +20,7 @@ date_default_timezone_set('America/Los_Angeles');
 require __DIR__ . '/vendor/PHPMailer/Exception.php';
 require __DIR__ . '/vendor/PHPMailer/PHPMailer.php';
 require __DIR__ . '/vendor/PHPMailer/SMTP.php';
-require __DIR__ . '/vendor/reCAPTCHA/autoload.php';
+require __DIR__ . '/vendor/recaptcha/autoload.php';
 
 # Constants to redefined
 # Check this for more configurations: https://blog.mailtrap.io/phpmailer
