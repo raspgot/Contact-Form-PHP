@@ -20,7 +20,7 @@ date_default_timezone_set('America/Los_Angeles');
 require __DIR__ . '/vendor/PHPMailer/Exception.php';
 require __DIR__ . '/vendor/PHPMailer/PHPMailer.php';
 require __DIR__ . '/vendor/PHPMailer/SMTP.php';
-require __DIR__ . '/vendor/recaptcha/autoload.php';
+require __DIR__ . '/vendor/reCAPTCHA/autoload.php';
 
 # Constants to redefined
 # Check this for more configurations: https://blog.mailtrap.io/phpmailer
