@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Simple, customizable and secure bootstrap contact form using Ajax, validations inputs, SMTP protocol, rejected domain not found and Google reCAPTCHA v3.
+ * Basic, simple and secure bootstrap contact form.
  * 
  * @see      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
  * @package  PHPMailer | reCAPTCHA v3
@@ -39,6 +39,7 @@ const HANDLER_MSG = [
     'enter_email'   => '❌ Please enter a valid email.',
     'enter_message' => '❌ Please enter your message.',
     'ajax_only'     => '❌ Asynchronous anonymous.',
+    # Mail body
     'email_body'    => '
         <h1>{{subject}}</h1>
         <p><b>Date</b>: {{date}}</p>
