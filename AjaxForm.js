@@ -61,7 +61,7 @@ onload = () => {
     });
 };
 
-var checkRecaptcha = () => {
+const checkRecaptcha = () => {
     grecaptcha.ready(function () {
         grecaptcha.execute(publicKey, {
             action: 'submit'
