@@ -35,7 +35,7 @@ SMTP sender &rarr; [HERE](https://www.infomaniak.com/fr/hebergement/web-et-mail/
 GOOGLE keys &rarr; [HERE](https://www.google.com/recaptcha/intro/v3.html)     
 More PHPMailer configurations &rarr; [HERE](https://github.com/PHPMailer/PHPMailer/tree/master/examples)
 
-**AjaxForm.php**     
+**/AjaxForm.php**     
 Timezones doc &rarr; [HERE](https://www.php.net/manual/fr/timezones.php)     
 
 ```php
@@ -47,12 +47,12 @@ const PASSWORD = ''; # SMTP password
 const SECRET_KEY = ''; # GOOGLE secret key
 ```
 
-**AjaxForm.js**
+**/AjaxForm.js**
 ```javascript
-const publicKey = 'GOOGLE_PUBLIC_KEY';
+const reCAPTCHA_site_key = 'GOOGLE_PUBLIC_KEY';
 ```
 
-**index.html**
+**/index.html**
 ```html
 <script src="https://www.google.com/recaptcha/api.js?render=GOOGLE_PUBLIC_KEY"></script>
 ```
@@ -63,9 +63,9 @@ You can cuztomise text error:
 <div class="invalid-feedback">Please provide a valid name</div>
 ```
 
-YOU MUST ALLOW *allow_url_fopen* OR *cURL* DIRECTIVE ON YOUR SERVER IN `php.ini`
-`extension=curl;`
-`allow_url_fopen = On`
+YOU MUST ALLOW *cURL* OR *allow_url_fopen* DIRECTIVE ON YOUR SERVER IN `php.ini`
+- `extension=curl;`
+- `allow_url_fopen = On`
 
 ## Author
 ![logo](https://dev.raspgot.fr/github/contact-form-php/raspgot-blue.png)
