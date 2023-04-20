@@ -7,11 +7,12 @@
  * @author Raspgot
  */
 
-const publicKey = 'GOOGLE_PUBLIC_KEY'; // GOOGLE public key
+const reCAPTCHA_site_key = 'GOOGLE_PUBLIC_KEY'; // GOOGLE public key
 
 onload = () => {
     'use strict'
 
+    // Execute grecaptcha initialization
     checkRecaptcha();
 
     let forms = document.querySelectorAll('.needs-validation');
@@ -61,12 +62,17 @@ onload = () => {
     });
 };
 
+/**
+ * @link https://developers.google.com/recaptcha/docs/v3#programmatically_invoke_the_challenge
+ */
 const checkRecaptcha = () => {
+    e.preventDefault();
+
     grecaptcha.ready(function () {
-        grecaptcha.execute(publicKey, {
+        grecaptcha.execute(reCAPTCHA_site_key, {
             action: 'submit'
         }).then(function (token) {
-            // input with recaptcha-token name take the recaptcha token value
+            // Input with recaptcha-token name take the recaptcha token value
             document.getElementsByName('recaptcha-token')[0].value = token;
         });
     });
