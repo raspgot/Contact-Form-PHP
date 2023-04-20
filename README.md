@@ -49,7 +49,7 @@ const SECRET_KEY = ''; # GOOGLE secret key
 
 **AjaxForm.js**
 ```javascript
-const publicKey = 'GOOGLE_PUBLIC_KEY';
+const reCAPTCHA_site_key = 'GOOGLE_PUBLIC_KEY';
 ```
 
 **index.html**
