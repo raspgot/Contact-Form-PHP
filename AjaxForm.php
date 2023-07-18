@@ -7,7 +7,7 @@
  * @package  PHPMailer | reCAPTCHA v3
  * @author   Gauthier Witkowski <contact@raspgot.fr>
  * @link     https://raspgot.fr
- * @version  1.3.0
+ * @version  1.3.1
  */
 
 use PHPMailer\PHPMailer\PHPMailer;
