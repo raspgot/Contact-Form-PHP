@@ -9,11 +9,11 @@
 
 const reCAPTCHA_site_key = 'GOOGLE_PUBLIC_KEY'; // GOOGLE public key
 
-onload = () => {
+onload = (event) => {
     'use strict'
 
     // Execute grecaptcha initialization
-    checkRecaptcha();
+    checkRecaptcha(event);
 
     let forms = document.querySelectorAll('.needs-validation');
     let spinner = document.getElementById('loading-spinner');
@@ -47,7 +47,7 @@ onload = () => {
                     if (alertClass && txt) {
                         form.querySelector('#alert-statut').insertAdjacentHTML('beforeend', alertBox);
                         form.reset();
-                        checkRecaptcha();
+                        checkRecaptcha(event);
                     }
                     spinner.classList.add('d-none');
                     setTimeout(function () {
@@ -65,8 +65,8 @@ onload = () => {
 /**
  * @link https://developers.google.com/recaptcha/docs/v3#programmatically_invoke_the_challenge
  */
-const checkRecaptcha = () => {
-    e.preventDefault();
+const checkRecaptcha = (event) => {
+    event.preventDefault();
 
     grecaptcha.ready(function () {
         grecaptcha.execute(reCAPTCHA_site_key, {
