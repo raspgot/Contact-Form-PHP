@@ -23,27 +23,30 @@
 
                     <!-- Inputs -->
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
+                        <label for="name" class="form-label fs-5">Name</label>
                         <input type="text" class="form-control" name="name" required>
                         <div class="valid-feedback">Name looks good</div>
                         <div class="invalid-feedback">Please provide a valid name</div>
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" required>
+                        <label for="email" class="form-label fs-5">Email</label>
+                        <input type="email" class="form-control" name="email" aria-describedby="emailHelp" required>
+                        <div id="emailHelp" class="form-text">Make sure to provide a valid email</div>
                         <div class="valid-feedback">Email looks good</div>
                         <div class="invalid-feedback">Please provide a valid email</div>
                     </div>
                     <div class="mb-4">
-                        <label for="message" class="form-label">Message</label>
+                        <label for="message" class="form-label fs-5">Message</label>
                         <textarea class="form-control" name="message" rows="4" required></textarea>
                         <div class="valid-feedback">The message looks good</div>
                         <div class="invalid-feedback">Please provide a valid message</div>
                     </div>
 
                     <!-- Submit button -->
-                    <button type="submit" class="btn btn-primary w-100">
-                        <span class="spinner-border spinner-border-sm me-2 d-none" id="loading-spinner" role="status" aria-hidden="true"></span>
+                    <button type="submit" class="btn btn-primary px-5">
+                        <div class="spinner-grow spinner-grow-sm me-2 d-none" id="loading-spinner" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                         <span>SEND</span>
                     </button>
 
