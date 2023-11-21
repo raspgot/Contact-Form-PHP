@@ -15,8 +15,9 @@ onload = (event) => {
     // Execute grecaptcha initialization
     checkRecaptcha(event);
 
-    let forms = document.querySelectorAll('.needs-validation');
+    let forms   = document.querySelectorAll('.needs-validation');
     let spinner = document.getElementById('loading-spinner');
+    let button  = document.querySelector('button[type="submit"]');
 
     Array.prototype.filter.call(forms, function (form) {
         form.addEventListener('submit', function (event) {
@@ -29,6 +30,7 @@ onload = (event) => {
                 event.preventDefault();
                 form.classList.remove('was-validated');
                 spinner.classList.remove('d-none');
+                button.disabled = true;
 
                 let data = new FormData(form);
                 let alertClass = 'alert-danger';
@@ -50,12 +52,14 @@ onload = (event) => {
                         checkRecaptcha(event);
                     }
                     spinner.classList.add('d-none');
+                    button.disabled = false;
                     setTimeout(function () {
                         form.querySelector('#alert-statut').innerHTML = '';
                     }, 5000);
                 }).catch((err) => {
                     console.log('Error encountered: ' + err);
                     spinner.classList.add('d-none');
+                    button.disabled = false;
                 });
             }
         }, false);
