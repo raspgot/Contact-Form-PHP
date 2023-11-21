@@ -750,7 +750,7 @@ class PHPMailer
      *
      * @var string
      */
-    const VERSION = '6.8.0';
+    const VERSION = '6.8.1';
 
     /**
      * Error severity: message only, continue processing.
@@ -795,7 +795,7 @@ class PHPMailer
      * The maximum line length supported by mail().
      *
      * Background: mail() will sometimes corrupt messages
-     * with headers headers longer than 65 chars, see #818.
+     * with headers longer than 65 chars, see #818.
      *
      * @var int
      */
@@ -1571,6 +1571,10 @@ class PHPMailer
 
             //Validate From, Sender, and ConfirmReadingTo addresses
             foreach (['From', 'Sender', 'ConfirmReadingTo'] as $address_kind) {
+                if ($this->{$address_kind} === null) {
+                    $this->{$address_kind} = '';
+                    continue;
+                }
                 $this->{$address_kind} = trim($this->{$address_kind});
                 if (empty($this->{$address_kind})) {
                     continue;
@@ -2187,10 +2191,17 @@ class PHPMailer
                     $this->smtp->hello($hello);
                     //Automatically enable TLS encryption if:
                     //* it's not disabled
+                    //* we are not connecting to localhost
                     //* we have openssl extension
                     //* we are not already using SSL
                     //* the server offers STARTTLS
-                    if ($this->SMTPAutoTLS && $sslext && 'ssl' !== $secure && $this->smtp->getServerExt('STARTTLS')) {
+                    if (
+                        $this->SMTPAutoTLS &&
+                        $this->Host !== 'localhost' &&
+                        $sslext &&
+                        $secure !== 'ssl' &&
+                        $this->smtp->getServerExt('STARTTLS')
+                    ) {
                         $tls = true;
                     }
                     if ($tls) {
