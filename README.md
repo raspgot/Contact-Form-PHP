@@ -63,9 +63,10 @@ You can cuztomise text error:
 <div class="invalid-feedback">Please provide a valid name</div>
 ```
 
-YOU MUST ALLOW *cURL* OR *allow_url_fopen* DIRECTIVE ON YOUR SERVER IN `php.ini`
+YOU MUST ALLOW *cURL* OR *allow_url_fopen* AND *php_openssl* DIRECTIVE ON YOUR SERVER IN `php.ini`
 - `extension=curl;`
 - `allow_url_fopen = On`
+- `extension=php_openssl.dll`
 
 ## Author
 ![logo](https://dev.raspgot.fr/github/contact-form-php/raspgot-blue.png)
