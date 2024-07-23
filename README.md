@@ -15,8 +15,8 @@ You can try this form here: https://dev.raspgot.fr/github/contact-form-php
 
 ## Features
 
-* PHP 8.3.7 ✔️ [(See supported versions)](https://www.php.net/supported-versions.php)
-* Bootstrap 5.X
+* PHP 8.3.9 ✔️ [(See supported versions)](https://www.php.net/supported-versions.php)
+* Bootstrap 5
 * Ajax submission
 * Google reCAPTCHA v3
 * PHPMailer SMTP Authentication
