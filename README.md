@@ -46,10 +46,10 @@ Timezones doc &rarr; [HERE](https://www.php.net/manual/fr/timezones.php)
 ```php
 date_default_timezone_set(''); # your country
 
-const HOST = ''; # SMTP server
-const USERNAME = ''; # SMTP username
-const PASSWORD = ''; # SMTP password
-const SECRET_KEY = ''; # GOOGLE secret key
+const SMTP_HOST     = ''; # SMTP server
+const SMTP_USERNAME = ''; # SMTP username
+const SMTP_PASSWORD = ''; # SMTP password
+const SECRET_KEY    = ''; # GOOGLE secret key
 ```
 
 **/AjaxForm.js**
