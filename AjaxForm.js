@@ -49,11 +49,9 @@ onload = (event) => {
                             if (txt.error === false) {
                                 alertClass = 'alert-success';
                             }
-                            let alertBox = '<div class="alert ' +  alertClass + '">' + txt.message + '</div>';
+                            let alertBox = '<div class="alert ' + alertClass + '">' + txt.message + '</div>';
                             if (alertClass && txt) {
-                                form.querySelector(
-                                    '#alert-statut'
-                                ).insertAdjacentHTML('beforeend', alertBox);
+                                form.querySelector('#alert-statut').insertAdjacentHTML('beforeend', alertBox);
                                 form.reset();
                                 checkRecaptcha(event);
                             }

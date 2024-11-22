@@ -114,7 +114,6 @@ if ($resp->isSuccess()) {
         # Send email
         $mail->send();
         statusHandler(false, HANDLER_MSG['success']);
-
     } catch (Exception $e) {
         statusHandler(true, $mail->ErrorInfo);
     }
