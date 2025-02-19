@@ -7,86 +7,74 @@
  * @author Raspgot
  */
 
-const reCAPTCHA_site_key = 'GOOGLE_PUBLIC_KEY'; // GOOGLE public key
+const RECAPTCHA_SITE_KEY = ''; // GOOGLE public key
 
-onload = (event) => {
+document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
-    // Execute grecaptcha initialization
-    checkRecaptcha(event);
+    const form = document.querySelector('.needs-validation');
+    if (!form) return; // Stop execution if no form is found
 
-    let forms   = document.querySelectorAll('.needs-validation');
-    let spinner = document.getElementById('loading-spinner');
-    let button  = document.querySelector('button[type="submit"]');
+    const spinner = document.getElementById('loading-spinner');
+    const button = document.querySelector('button[type="submit"]');
+    const formAlert = document.getElementById('alert-statut');
 
-    Array.prototype.filter.call(forms, function (form) {
-        form.addEventListener(
-            'submit',
-            function (event) {
-                if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-                if (form.checkValidity() === true) {
-                    event.preventDefault();
-                    form.classList.remove('was-validated');
-                    spinner.classList.remove('d-none');
-                    button.disabled = true;
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
 
-                    let data = new FormData(form);
-                    let alertClass = 'alert-danger';
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) return;
 
-                    fetch('AjaxForm.php', {
-                        method: 'post',
-                        body: data,
-                    })
-                        .then((data) => {
-                            return data.text();
-                        })
-                        .then((txt) => {
-                            txt = JSON.parse(txt);
-                            if (txt.error === false) {
-                                alertClass = 'alert-success';
-                            }
-                            let alertBox = '<div class="alert ' + alertClass + '">' + txt.message + '</div>';
-                            if (alertClass && txt) {
-                                form.querySelector('#alert-statut').insertAdjacentHTML('beforeend', alertBox);
-                                form.reset();
-                                checkRecaptcha(event);
-                            }
-                            spinner.classList.add('d-none');
-                            button.disabled = false;
-                            setTimeout(function () {
-                                form.querySelector('#alert-statut').innerHTML = '';
-                            }, 5000);
-                        })
-                        .catch((err) => {
-                            console.log('Error encountered: ' + err);
-                            spinner.classList.add('d-none');
-                            button.disabled = false;
-                        });
-                }
-            },
-            false
-        );
-    });
-};
+        spinner.classList.remove('d-none');
+        button.disabled = true;
 
-/**
- * @link https://developers.google.com/recaptcha/docs/v3#programmatically_invoke_the_challenge
- */
-const checkRecaptcha = (event) => {
-    event.preventDefault();
+        try {
+            // Retrieve the reCAPTCHA token
+            const token = await executeRecaptcha();
+            const formData = new FormData(form);
+            formData.append('recaptcha_token', token);
 
-    grecaptcha.ready(function () {
-        grecaptcha
-            .execute(reCAPTCHA_site_key, {
-                action: 'submit',
-            })
-            .then(function (token) {
-                // Input with recaptcha-token name take the recaptcha token value
-                document.getElementsByName('recaptcha-token')[0].value = token;
+            const response = await fetch('AjaxForm.php', {
+                method: 'POST',
+                body: formData,
             });
+
+            if (!response.ok) throw new Error('Network error');
+
+            const data = await response.json();
+            showMessage(data.message, data.success ? 'success' : 'danger');
+
+            if (data.success) {
+                form.reset();
+                form.classList.remove('was-validated');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('An error occurred, please try again', 'danger');
+        } finally {
+            spinner.classList.add('d-none');
+            button.disabled = false;
+        }
     });
-};
+
+    /**
+     * Execute Google reCAPTCHA v3 and return the token
+     * @returns {Promise<string>}
+     */
+    async function executeRecaptcha() {
+        await new Promise((resolve) => grecaptcha.ready(resolve));
+        return grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' });
+    }
+
+    /**
+     * Display an alert message
+     * @param {string} message The message to display
+     * @param {string} type The type of alert ('success' or 'danger')
+     */
+    function showMessage(message, type) {
+        formAlert.className = `alert alert-${type}`;
+        formAlert.textContent = message;
+        formAlert.classList.remove('d-none');
+    }
+});
