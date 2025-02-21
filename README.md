@@ -13,7 +13,7 @@ Try the form live here: https://dev.raspgot.fr/github/contact-form-php
 
 ## Features
 
--   **PHP 8.4.4** ([See supported versions](https://www.php.net/supported-versions.php))
+-   **PHP 8.4** ([See supported versions](https://www.php.net/supported-versions.php))
 -   **Bootstrap 5**
 -   **Ajax submission** – Seamless asynchronous form handling.
 -   **Google reCAPTCHA v3** – Protect your form from spam.
@@ -36,9 +36,9 @@ Alternatively, you can use [Laragon](https://laragon.org) / [XAMMP](https://www.
 
 Before using the form, configure your SMTP and Google reCAPTCHA settings.
 
-**SMTP Sender**: Configure your SMTP settings (e.g., via [Infomaniak](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)).
-**Google reCAPTCHA v3**: Obtain your keys from [Google reCAPTCHA](https://www.google.com/recaptcha/intro/v3.html).
-**PHPMailer Configuration**: See more options in the [PHPMailer examples](https://github.com/PHPMailer/PHPMailer/tree/master/examples).
+-   **SMTP Sender**: Configure your SMTP settings (e.g., via [Infomaniak](https://www.infomaniak.com/fr/hebergement/web-et-mail/hebergement-mail)).
+-   **Google reCAPTCHA v3**: Obtain your keys from [Google reCAPTCHA](https://www.google.com/recaptcha/intro/v3.html).
+-   **PHPMailer Configuration**: See more options in the [PHPMailer examples](https://github.com/PHPMailer/PHPMailer/tree/master/examples).
 
 ```php
 const SMTP_HOST     = ''; # SMTP server address
