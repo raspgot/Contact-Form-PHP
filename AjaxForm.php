@@ -144,14 +144,14 @@ function validRecaptcha(string $token): string|bool
 
     # Check cURL errors
     if ($response === false || $http_code !== 200) {
-        statusHandler(false, '❌ Error during the Google reCAPTCHA request: ', $curl_error ?: "HTTP $http_code");
+        statusHandler(false, '❌ Error during the Google reCAPTCHA request:', $curl_error ?: "HTTP $http_code");
     }
 
     $responseData = json_decode($response, true);
 
     # Handle errors returned by Google
     if (!$responseData["success"]) {
-        statusHandler(false, '❌ reCAPTCHA validation failed', $responseData["error-codes"] ?? []);
+        statusHandler(false, '❌ reCAPTCHA validation failed:', $responseData["error-codes"] ?? []);
     }
 
     # Check score threshold (recommended: 0.5)

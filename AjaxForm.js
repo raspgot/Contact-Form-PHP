@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Network error');
 
             const data = await response.json();
-            showMessage(data.message, data.success ? 'success' : 'danger');
+            const message = data.detail ? data.message + " " + data.detail : data.message;
+            showMessage(message, data.success ? 'success' : 'danger');
 
             if (data.success) {
                 form.reset();
