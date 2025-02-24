@@ -27,7 +27,7 @@ Clone the repository or [download it directly](https://github.com/raspgot/Contac
 ```bash
 git clone https://github.com/raspgot/Contact-Form-PHP.git
 cd Contact-Form-PHP
-php -S localhost:8000
+php -S localhost:8000 # need cacert.pem in php.ini
 ```
 
 Alternatively, you can use [Laragon](https://laragon.org) / [XAMMP](https://www.apachefriends.org)
