@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Basic, simple and secure bootstrap contact form.
+ * Basic, simple and secure contact form.
  * 
  * @see      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
  * @package  PHPMailer
@@ -38,8 +38,8 @@ const EMAIL_MSG = [
     'enter_email'    => '❌ Please enter a valid email',
     'enter_message'  => '❌ Please enter your message',
     'token_error'    => '❌ No reCAPTCHA token received',
-    'domain_error'   => '❌ Le domaine de l\'e-mail est invalide',
-    'method_error'   => '❌ Méthode non autorisée',
+    'domain_error'   => '❌ The email domain is invalid',
+    'method_error'   => '❌ Method not allowed',
     'constant_error' => '❌ Some constants are not defined in ' . __FILE__,
 ];
 
@@ -61,7 +61,7 @@ $name    = secure($_POST['name']) ?? statusHandler(false, EMAIL_MSG['enter_name'
 $message = secure($_POST['message']) ?? statusHandler(false, EMAIL_MSG['enter_message']);
 $token   = secure($_POST['recaptcha_token']) ?? statusHandler(false, EMAIL_MSG['token_error']);
 
-# Vérification du domaine de l'email
+# Verify email domain
 $domain  = substr(strrchr($email, "@"), 1);
 if (!checkdnsrr($domain, "MX") && !checkdnsrr($domain, "A")) {
     statusHandler(false, EMAIL_MSG['domain_error']);
@@ -83,7 +83,7 @@ $email_body = sprintf(
     $ip
 );
 
-# Verifying the user's response
+# Verify the user's response
 validRecaptcha($token);
 
 # Instantiation of PHPMailer
