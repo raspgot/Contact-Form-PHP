@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Network error');
 
             const data = await response.json();
-            const message = data.detail ? data.message + " " + data.detail : data.message;
+            const message = data.detail ? `${data.message} ${data.detail}` : data.message;
             showMessage(message, data.success ? 'success' : 'danger');
 
             if (data.success) {
@@ -77,5 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         formAlert.className = `alert alert-${type}`;
         formAlert.textContent = message;
         formAlert.classList.remove('d-none');
+        formAlert.scrollIntoView({ behavior: 'smooth' });
     }
 });
