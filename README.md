@@ -49,7 +49,7 @@ const SECRET_KEY    = ''; # Google reCAPTCHA secret key
 Update your **AjaxForm.js** file with your reCAPTCHA site key:
 
 ```javascript
-const RECAPTCHA_SITE_KEY = 'GOOGLE_PUBLIC_KEY';
+const RECAPTCHA_SITE_KEY = 'RECAPTCHA_SITE_KEY';
 ```
 
 And include the reCAPTCHA script in **index.html**:
