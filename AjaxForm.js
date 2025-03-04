@@ -7,7 +7,7 @@
  * @author Raspgot
  */
 
-const RECAPTCHA_SITE_KEY = ''; // GOOGLE public key
+const RECAPTCHA_SITE_KEY = 'RECAPTCHA_SITE_KEY'; // GOOGLE public key
 
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
