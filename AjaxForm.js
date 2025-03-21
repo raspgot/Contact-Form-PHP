@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData,
             });
 
-            if (!response.ok) throw new Error('Network error');
+            if (!response.ok) throw new Error(`Network error: ${response.status}`);
 
             const data = await response.json();
             const message = data.detail ? `${data.message} ${data.detail}` : data.message;
