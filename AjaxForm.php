@@ -31,7 +31,7 @@ const SMTP_PASSWORD = '';    # SMTP password
 const SMTP_SECURE   = 'tls'; # 'ssl' or 'tls'
 const SMTP_PORT     = 587;   # 465 pour SSL, 587 pour TLS
 const SMTP_AUTH     = true;
-const EMAIL_SUBJECT = 'New message !';
+const EMAIL_SUBJECT = '[raspgot/Contact-Form-PHP] New message !';
 const EMAIL_MSG = [
     'success'        => '✔️ Your message has been sent !',
     'enter_name'     => '❌ Please enter your name',
@@ -69,12 +69,38 @@ if (!checkdnsrr($domain, "MX") && !checkdnsrr($domain, "A")) {
 
 # Prepare email body
 $email_body = sprintf(
-    '<h1>%s</h1>
-    <p><b>Date</b>: %s</p>
-    <p><b>Name</b>: %s</p>
-    <p><b>E-Mail</b>: %s</p>
-    <p><b>Message</b>: %s</p>
-    <p><b>IP</b>: %s</p>',
+    '<!DOCTYPE html>
+    <html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>%s</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
+        <table width="100%%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td align="center">
+                    <table width="600" cellpadding="20" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <tr>
+                            <td align="center" style="font-size: 24px; color: #333333;">
+                                <strong>%s</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="color: #555555; line-height: 1.5;">
+                                <p style="margin: 10px 0;"><strong>Date :</strong> %s</p>
+                                <p style="margin: 10px 0;"><strong>Nom :</strong> %s</p>
+                                <p style="margin: 10px 0;"><strong>E-mail :</strong> %s</p>
+                                <p style="margin: 10px 0;"><strong>Message :</strong><br>%s</p>
+                                <p style="margin: 10px 0;"><strong>IP :</strong> %s</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>',
+    EMAIL_SUBJECT,
     EMAIL_SUBJECT,
     $date->format('j/m/Y H:i:s'),
     $name,
