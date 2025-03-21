@@ -7,15 +7,15 @@
  * @package  PHPMailer
  * @author   Gauthier Witkowski <contact@raspgot.fr>
  * @link     https://raspgot.fr
- * @version  1.4.0
+ * @version  1.4.1
  */
 
 declare(strict_types=1);
 
-# The response is in JSON format
+// The response will be in JSON format
 header('Content-Type: application/json');
 
-# Include PHPMailer
+// Include PHPMailer and its dependencies
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -23,13 +23,13 @@ require_once 'PHPMailer/PHPMailer.php';
 require_once 'PHPMailer/SMTP.php';
 require_once 'PHPMailer/Exception.php';
 
-# Constants to redefine
-const SECRET_KEY    = '';    # GOOGLE secret key
-const SMTP_HOST     = '';    # SMTP server
-const SMTP_USERNAME = '';    # SMTP username
-const SMTP_PASSWORD = '';    # SMTP password
-const SMTP_SECURE   = 'tls'; # 'ssl' or 'tls'
-const SMTP_PORT     = 587;   # 465 pour SSL, 587 pour TLS
+// Define constants for configuration
+const SECRET_KEY    = '';    // Google reCAPTCHA secret key
+const SMTP_HOST     = '';    // SMTP server
+const SMTP_USERNAME = '';    // SMTP username
+const SMTP_PASSWORD = '';    // SMTP password
+const SMTP_SECURE   = 'tls'; // 'ssl' or 'tls'
+const SMTP_PORT     = 587;   // 465 for SSL, 587 for TLS
 const SMTP_AUTH     = true;
 const EMAIL_SUBJECT = '[raspgot/Contact-Form-PHP] New message !';
 const EMAIL_MSG = [
@@ -43,34 +43,34 @@ const EMAIL_MSG = [
     'constant_error' => '❌ Some constants are not defined in ' . __FILE__,
 ];
 
-# Check if constants are defined
+// Check if required constants are defined
 if (empty(SECRET_KEY) || empty(SMTP_HOST) || empty(SMTP_USERNAME) || empty(SMTP_PASSWORD)) {
     statusHandler(false, EMAIL_MSG['constant_error']);
 }
 
-# Check if the request method is POST
+// Allow only POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     statusHandler(false, EMAIL_MSG['method_error']);
 }
 
-# Retrieve and clean data
+// Retrieve and sanitize data
 $date    = new DateTime();
 $ip      = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ?? 'Unknown';
-$email   = filter_var(secure($_POST['email']), FILTER_SANITIZE_EMAIL) ?? statusHandler(false, EMAIL_MSG['enter_email']);
-$name    = secure($_POST['name']) ?? statusHandler(false, EMAIL_MSG['enter_name']);
-$message = secure($_POST['message']) ?? statusHandler(false, EMAIL_MSG['enter_message']);
-$token   = secure($_POST['recaptcha_token']) ?? statusHandler(false, EMAIL_MSG['token_error']);
+$email   = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ?: statusHandler(false, EMAIL_MSG['enter_email']);
+$name    = (string) secure($_POST['name']) ?: statusHandler(false, EMAIL_MSG['enter_name']);
+$message = (string) secure($_POST['message']) ?: statusHandler(false, EMAIL_MSG['enter_message']);
+$token   = (string) secure($_POST['recaptcha_token']) ?: statusHandler(false, EMAIL_MSG['token_error']);
 
-# Verify email domain
-$domain  = substr(strrchr($email, "@"), 1);
+// Verify email domain
+$domain = substr(strrchr($email, "@"), 1);
 if (!checkdnsrr($domain, "MX") && !checkdnsrr($domain, "A")) {
     statusHandler(false, EMAIL_MSG['domain_error']);
 }
 
-# Prepare email body
+// Prepare email body with inline styles for maximum compatibility
 $email_body = sprintf(
     '<!DOCTYPE html>
-    <html lang="fr">
+    <html lang="en">
     <head>
         <meta charset="UTF-8">
         <title>%s</title>
@@ -87,11 +87,11 @@ $email_body = sprintf(
                         </tr>
                         <tr>
                             <td style="color: #555555; line-height: 1.5;">
-                                <p style="margin: 10px 0;"><strong>Date :</strong> %s</p>
-                                <p style="margin: 10px 0;"><strong>Nom :</strong> %s</p>
-                                <p style="margin: 10px 0;"><strong>E-mail :</strong> %s</p>
-                                <p style="margin: 10px 0;"><strong>Message :</strong><br>%s</p>
-                                <p style="margin: 10px 0;"><strong>IP :</strong> %s</p>
+                                <p style="margin: 12px 0;"><strong>Date:</strong> %s</p>
+                                <p style="margin: 12px 0;"><strong>Name:</strong> %s</p>
+                                <p style="margin: 12px 0;"><strong>Email:</strong> %s</p>
+                                <p style="margin: 12px 0;"><strong>Message:</strong><br>%s</p>
+                                <p style="margin: 12px 0;"><strong>IP:</strong> %s</p>
                             </td>
                         </tr>
                     </table>
@@ -109,14 +109,14 @@ $email_body = sprintf(
     $ip
 );
 
-# Verify the user's response
+// Validate the reCAPTCHA token
 validRecaptcha($token);
 
-# Instantiation of PHPMailer
+// Instantiate PHPMailer and send the email
 $mail = new PHPMailer(true);
 
 try {
-    # Server settings
+    // SMTP server settings
     $mail->isSMTP();                   # Set mailer to use SMTP
     $mail->Host       = SMTP_HOST;     # Specify main and backup SMTP servers
     $mail->Port       = SMTP_PORT;     # TCP port
@@ -125,20 +125,20 @@ try {
     $mail->Password   = SMTP_PASSWORD; # SMTP password
     $mail->SMTPSecure = SMTP_SECURE;   # Enable TLS encryption, `ssl` also accepted
 
-    # Recipients
+    // Set sender and recipients
     $mail->setFrom(SMTP_USERNAME, 'Raspgot');
     $mail->addAddress($email, $name);
     $mail->addCC(SMTP_USERNAME, 'Dev_copy');
     $mail->addReplyTo(SMTP_USERNAME, 'Information');
 
-    # Content
+    // Email content settings
     $mail->isHTML(true);
     $mail->CharSet = 'UTF-8';
     $mail->Subject = EMAIL_SUBJECT;
     $mail->Body    = $email_body;
     $mail->AltBody = strip_tags($email_body);
 
-    # Send email
+    // Send the email
     $mail->send();
     statusHandler(true, EMAIL_MSG['success']);
 } catch (Exception $e) {
@@ -146,42 +146,38 @@ try {
 }
 
 /**
- * Call to Google reCAPTCHA with cURL
+ * Validate the reCAPTCHA token by calling Google's API using cURL
  *
  * @param string $token
- * @return string|boolean
+ * @return bool|string
  */
-function validRecaptcha(string $token): string|bool
+function validRecaptcha(string $token): bool|string
 {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, 'https://www.google.com/recaptcha/api/siteverify');
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
-        "secret" => SECRET_KEY,
-        "response" => $token
+        'secret'   => SECRET_KEY,
+        'response' => $token
     ]));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $response   = curl_exec($ch);
+    $http_code  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curl_error = curl_error($ch);
     curl_close($ch);
 
-    # Check cURL errors
     if ($response === false || $http_code !== 200) {
-        statusHandler(false, '❌ Error during the Google reCAPTCHA request:', $curl_error ?: "HTTP $http_code");
+        statusHandler(false, '❌ Error during the Google reCAPTCHA request:' . ($curl_error ?: "HTTP $http_code"));
     }
 
     $responseData = json_decode($response, true);
-
-    # Handle errors returned by Google
-    if (!$responseData["success"]) {
-        statusHandler(false, '❌ reCAPTCHA validation failed:', $responseData["error-codes"] ?? []);
+    if (!$responseData['success']) {
+        statusHandler(false, '❌ reCAPTCHA validation failed:', $responseData['error-codes'] ?? []);
     }
 
-    # Check score threshold (recommended: 0.5)
-    if (isset($responseData["score"]) && $responseData["score"] < 0.5) {
+    if (isset($responseData['score']) && $responseData['score'] < 0.5) {
         statusHandler(false, '❌ reCAPTCHA score too low. Bot risk detected');
     }
 
@@ -189,7 +185,7 @@ function validRecaptcha(string $token): string|bool
 }
 
 /**
- * Secure input fields
+ * Sanitize input data.
  *
  * @param string $data
  * @return string
@@ -200,7 +196,7 @@ function secure(string $data): string
 }
 
 /**
- * Return error or success JSON response
+ * Send a JSON response and terminate the script.
  *
  * @param bool   $success
  * @param string $message
@@ -214,6 +210,5 @@ function statusHandler(bool $success, string $message, $detail = null): void
         'message' => $message,
         'detail'  => $detail,
     ]);
-
     exit;
 }
