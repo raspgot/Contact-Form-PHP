@@ -8,7 +8,7 @@ A basic, simple, and secure Bootstrap contact form with AJAX submission. It feat
 
 ## Live Demo
 
-Try the form live here: https://dev.raspgot.fr/github/contact-form-php
+Try the form live here: https://dev.raspgot.fr/github/contact-form-php (down temporarily)
 
 ## Features
 
