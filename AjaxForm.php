@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Basic, simple and secure contact form.
+ * Improved basic and secure contact form using PHPMailer and reCAPTCHA.
  * 
  * @see      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
  * @package  PHPMailer
  * @author   Gauthier Witkowski <contact@raspgot.fr>
  * @link     https://raspgot.fr
- * @version  1.4.1
+ * @version  1.4.2
  */
 
 declare(strict_types=1);
@@ -15,7 +15,7 @@ declare(strict_types=1);
 // The response will be in JSON format
 header('Content-Type: application/json');
 
-// Include PHPMailer and its dependencies
+// Load PHPMailer classes
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -23,51 +23,53 @@ require_once 'PHPMailer/PHPMailer.php';
 require_once 'PHPMailer/SMTP.php';
 require_once 'PHPMailer/Exception.php';
 
-// Define constants for configuration
+// Configuration constants
 const SECRET_KEY    = '';    // Google reCAPTCHA secret key
 const SMTP_HOST     = '';    // SMTP server
 const SMTP_USERNAME = '';    // SMTP username
 const SMTP_PASSWORD = '';    // SMTP password
-const SMTP_SECURE   = 'tls'; // 'ssl' or 'tls'
-const SMTP_PORT     = 587;   // 465 for SSL, 587 for TLS
+const SMTP_SECURE   = 'tls'; // Encryption: 'ssl' or 'tls'
+const SMTP_PORT     = 587;   // Port: 465 for SSL, 587 for TLS
 const SMTP_AUTH     = true;
 const EMAIL_SUBJECT = '[raspgot/Contact-Form-PHP] New message !';
 const EMAIL_MSG = [
     'success'        => '✔️ Your message has been sent !',
-    'enter_name'     => '❌ Please enter your name',
-    'enter_email'    => '❌ Please enter a valid email',
-    'enter_message'  => '❌ Please enter your message',
-    'token_error'    => '❌ No reCAPTCHA token received',
-    'domain_error'   => '❌ The email domain is invalid',
-    'method_error'   => '❌ Method not allowed',
+    'enter_name'     => '❌ Please enter your name.',
+    'enter_email'    => '❌ Please enter a valid email.',
+    'enter_message'  => '❌ Please enter your message.',
+    'token_error'    => '❌ No reCAPTCHA token received.',
+    'domain_error'   => '❌ The email domain is invalid.',
+    'method_error'   => '❌ Method not allowed.',
     'constant_error' => '❌ Some constants are not defined in ' . __FILE__,
 ];
 
-// Check if required constants are defined
+// Check if essential constants are set
 if (empty(SECRET_KEY) || empty(SMTP_HOST) || empty(SMTP_USERNAME) || empty(SMTP_PASSWORD)) {
-    statusHandler(false, EMAIL_MSG['constant_error']);
+    respond(false, EMAIL_MSG['constant_error']);
 }
 
-// Allow only POST requests
+// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    statusHandler(false, EMAIL_MSG['method_error']);
+    respond(false, EMAIL_MSG['method_error']);
 }
 
-// Retrieve and sanitize data
-$date    = new DateTime();
-$ip      = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ?? 'Unknown';
-$email   = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL) ?: statusHandler(false, EMAIL_MSG['enter_email']);
-$name    = (string) secure($_POST['name']) ?: statusHandler(false, EMAIL_MSG['enter_name']);
-$message = (string) secure($_POST['message']) ?: statusHandler(false, EMAIL_MSG['enter_message']);
-$token   = (string) secure($_POST['recaptcha_token']) ?: statusHandler(false, EMAIL_MSG['token_error']);
+// Get current date and user IP address
+$date = new DateTime();
+$ip   = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP) ?? 'Unknown';
 
-// Verify email domain
+// Retrieve and sanitize input data
+$email   = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL) ?: respond(false, EMAIL_MSG['enter_email']);
+$name    = isset($_POST['name']) ? sanitize($_POST['name']) : respond(false, EMAIL_MSG['enter_name']);
+$message = isset($_POST['message']) ? sanitize($_POST['message']) : respond(false, EMAIL_MSG['enter_message']);
+$token   = isset($_POST['recaptcha_token']) ? sanitize($_POST['recaptcha_token']) : respond(false, EMAIL_MSG['token_error']);
+
+// Verify email domain validity
 $domain = substr(strrchr($email, "@"), 1);
 if (!checkdnsrr($domain, "MX") && !checkdnsrr($domain, "A")) {
-    statusHandler(false, EMAIL_MSG['domain_error']);
+    respond(false, EMAIL_MSG['domain_error']);
 }
 
-// Prepare email body with inline styles for maximum compatibility
+// Build the email body
 $email_body = sprintf(
     '<!DOCTYPE html>
     <html lang="en">
@@ -110,22 +112,22 @@ $email_body = sprintf(
 );
 
 // Validate the reCAPTCHA token
-validRecaptcha($token);
+validateRecaptcha($token);
 
-// Instantiate PHPMailer and send the email
+// Create and configure PHPMailer instance
 $mail = new PHPMailer(true);
 
 try {
     // SMTP server settings
-    $mail->isSMTP();                   # Set mailer to use SMTP
-    $mail->Host       = SMTP_HOST;     # Specify main and backup SMTP servers
-    $mail->Port       = SMTP_PORT;     # TCP port
-    $mail->SMTPAuth   = SMTP_AUTH;     # Enable SMTP authentication
-    $mail->Username   = SMTP_USERNAME; # SMTP username
-    $mail->Password   = SMTP_PASSWORD; # SMTP password
-    $mail->SMTPSecure = SMTP_SECURE;   # Enable TLS encryption, `ssl` also accepted
+    $mail->isSMTP();
+    $mail->Host       = SMTP_HOST;
+    $mail->Port       = SMTP_PORT;
+    $mail->SMTPAuth   = SMTP_AUTH;
+    $mail->Username   = SMTP_USERNAME;
+    $mail->Password   = SMTP_PASSWORD;
+    $mail->SMTPSecure = SMTP_SECURE;
 
-    // Set sender and recipients
+    // Sender and recipient settings
     $mail->setFrom(SMTP_USERNAME, 'Raspgot');
     $mail->addAddress($email, $name);
     $mail->addCC(SMTP_USERNAME, 'Dev_copy');
@@ -138,20 +140,20 @@ try {
     $mail->Body    = $email_body;
     $mail->AltBody = strip_tags($email_body);
 
-    // Send the email
+    // Send email
     $mail->send();
-    statusHandler(true, EMAIL_MSG['success']);
+    respond(true, EMAIL_MSG['success']);
 } catch (Exception $e) {
-    statusHandler(false, '❌ ' . $e->getMessage());
+    respond(false, '❌ ' . $e->getMessage());
 }
 
 /**
- * Validate the reCAPTCHA token by calling Google's API using cURL
+ * Validate the reCAPTCHA token using Google's API using cURL.
  *
  * @param string $token
- * @return bool|string
+ * @return void
  */
-function validRecaptcha(string $token): bool|string
+function validateRecaptcha(string $token): void
 {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, 'https://www.google.com/recaptcha/api/siteverify');
@@ -169,19 +171,17 @@ function validRecaptcha(string $token): bool|string
     curl_close($ch);
 
     if ($response === false || $http_code !== 200) {
-        statusHandler(false, '❌ Error during the Google reCAPTCHA request:' . ($curl_error ?: "HTTP $http_code"));
+        respond(false, '❌ Error during the Google reCAPTCHA request:' . ($curl_error ?: "HTTP $http_code"));
     }
 
     $responseData = json_decode($response, true);
-    if (!$responseData['success']) {
-        statusHandler(false, '❌ reCAPTCHA validation failed:', $responseData['error-codes'] ?? []);
+    if (!isset($responseData['success']) || !$responseData['success']) {
+        respond(false, '❌ reCAPTCHA validation failed:', $responseData['error-codes'] ?? []);
     }
 
     if (isset($responseData['score']) && $responseData['score'] < 0.5) {
-        statusHandler(false, '❌ reCAPTCHA score too low. Bot risk detected');
+        respond(false, '❌ reCAPTCHA score too low. Bot risk detected.');
     }
-
-    return true;
 }
 
 /**
@@ -190,7 +190,7 @@ function validRecaptcha(string $token): bool|string
  * @param string $data
  * @return string
  */
-function secure(string $data): string
+function sanitize(string $data): string
 {
     return trim(stripslashes(htmlspecialchars($data, ENT_QUOTES, 'UTF-8')));
 }
@@ -203,7 +203,7 @@ function secure(string $data): string
  * @param mixed  $detail
  * @return void
  */
-function statusHandler(bool $success, string $message, $detail = null): void
+function respond(bool $success, string $message, $detail = null): void
 {
     echo json_encode([
         'success' => $success,

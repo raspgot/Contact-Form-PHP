@@ -1,13 +1,13 @@
 /**
  * .checkValidity | https://getbootstrap.com/docs/5.3/forms/validation
- * FormData | https://developer.mozilla.org/en-US/docs/Web/API/FormData
- * fetch | https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
- * reCaptcha v3 | https://developers.google.com/recaptcha/docs/v3
+ * FormData       | https://developer.mozilla.org/en-US/docs/Web/API/FormData
+ * fetch          | https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+ * reCaptcha v3   | https://developers.google.com/recaptcha/docs/v3
  *
- * @author Raspgot
+ * Author: Raspgot
  */
 
-const RECAPTCHA_SITE_KEY = 'RECAPTCHA_SITE_KEY'; // GOOGLE public key
+const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY'; // GOOGLE public key
 
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!form) return; // Stop execution if no form is found
 
     const spinner = document.getElementById('loading-spinner');
-    const button = document.querySelector('button[type="submit"]');
-    const formAlert = document.getElementById('alert-statut');
+    const submitButton = document.querySelector('button[type="submit"]');
+    const alertContainer = document.getElementById('alert-status');
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -26,11 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
         form.classList.add('was-validated');
         if (!form.checkValidity()) return;
 
+        // Toggles the loading state (shows/hides the spinner and disables/enables the submit button)
         spinner.classList.remove('d-none');
-        button.disabled = true;
+        submitButton.disabled = true;
 
         try {
-            // Retrieve the reCAPTCHA token
             const token = await executeRecaptcha();
             const formData = new FormData(form);
             formData.append('recaptcha_token', token);
@@ -40,11 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData,
             });
 
-            if (!response.ok) throw new Error(`Network error: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Network error: ${response.status}`);
+            }
 
             const data = await response.json();
             const message = data.detail ? `${data.message} ${data.detail}` : data.message;
-            showMessage(message, data.success ? 'success' : 'danger');
+            displayAlert(message, data.success ? 'success' : 'danger');
 
             if (data.success) {
                 form.reset();
@@ -52,15 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error:', error);
-            showMessage('An error occurred, please try again', 'danger');
+            displayAlert('An error occurred, please try again.', 'danger');
         } finally {
             spinner.classList.add('d-none');
-            button.disabled = false;
+            submitButton.disabled = false;
         }
     });
 
     /**
-     * Execute Google reCAPTCHA v3 and return the token
+     * Executes Google reCAPTCHA v3 and returns the token
      * @returns {Promise<string>}
      */
     async function executeRecaptcha() {
@@ -69,14 +71,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Display an alert message
+     * Displays an alert message
      * @param {string} message The message to display
      * @param {string} type The type of alert ('success' or 'danger')
      */
-    function showMessage(message, type) {
-        formAlert.className = `alert alert-${type}`;
-        formAlert.textContent = message;
-        formAlert.classList.remove('d-none');
-        formAlert.scrollIntoView({ behavior: 'smooth' });
+    function displayAlert(message, type) {
+        alertContainer.className = `alert alert-${type}`;
+        alertContainer.textContent = message;
+        alertContainer.classList.remove('d-none');
+        alertContainer.scrollIntoView({ behavior: 'smooth' });
     }
 });
