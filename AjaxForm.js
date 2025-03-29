@@ -7,16 +7,16 @@
  * Author: Raspgot
  */
 
-const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY'; // GOOGLE public key
+const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY'; // Replace with your reCAPTCHA public key
 
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
     const form = document.querySelector('.needs-validation');
-    if (!form) return; // Stop execution if no form is found
+    if (!form) return;
 
-    const spinner = document.getElementById('loading-spinner');
-    const submitButton = document.querySelector('button[type="submit"]');
+    const spinner        = document.getElementById('loading-spinner');
+    const submitButton   = form.querySelector('button[type="submit"]');
     const alertContainer = document.getElementById('alert-status');
 
     form.addEventListener('submit', async (event) => {
@@ -24,14 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
         event.stopPropagation();
 
         form.classList.add('was-validated');
-        if (!form.checkValidity()) return;
 
-        // Toggles the loading state (shows/hides the spinner and disables/enables the submit button)
-        spinner.classList.remove('d-none');
-        submitButton.disabled = true;
+        if (!form.checkValidity()) {
+            const firstInvalid = form.querySelector(':invalid');
+            if (firstInvalid) firstInvalid.focus();
+            return;
+        }
+
+        toggleLoading(true);
 
         try {
-            const token = await executeRecaptcha();
+            const token = await getRecaptchaToken();
             const formData = new FormData(form);
             formData.append('recaptcha_token', token);
 
@@ -40,42 +43,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData,
             });
 
-            if (!response.ok) {
-                throw new Error(`Network error: ${response.status}`);
-            }
-
-            const data = await response.json();
-            const message = data.detail ? `${data.message} ${data.detail}` : data.message;
-            displayAlert(message, data.success ? 'success' : 'danger');
+            const data = await handleResponse(response);
+            showAlert(data.message, data.success ? 'success' : 'danger');
 
             if (data.success) {
                 form.reset();
                 form.classList.remove('was-validated');
             }
         } catch (error) {
-            console.error('Error:', error);
-            displayAlert('An error occurred, please try again.', 'danger');
+            console.error('Submission error:', error);
+            showAlert('An error occurred, please try again.', 'danger');
         } finally {
-            spinner.classList.add('d-none');
-            submitButton.disabled = false;
+            toggleLoading(false);
         }
     });
 
     /**
-     * Executes Google reCAPTCHA v3 and returns the token
+     * Get reCAPTCHA v3 token
      * @returns {Promise<string>}
      */
-    async function executeRecaptcha() {
-        await new Promise((resolve) => grecaptcha.ready(resolve));
-        return grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' });
+    function getRecaptchaToken() {
+        return new Promise((resolve) => {
+            grecaptcha.ready(() => {
+                grecaptcha
+                    .execute(RECAPTCHA_SITE_KEY, { action: 'submit' })
+                    .then(resolve)
+                    .catch((error) => {
+                        console.error('reCAPTCHA error:', error);
+                        showAlert('reCAPTCHA verification failed.', 'danger');
+                        toggleLoading(false);
+                    });
+            });
+        });
     }
 
     /**
-     * Displays an alert message
-     * @param {string} message The message to display
-     * @param {string} type The type of alert ('success' or 'danger')
+     * Handle fetch response
+     * @param {Response} response
+     * @returns {Promise<Object>}
      */
-    function displayAlert(message, type) {
+    async function handleResponse(response) {
+        if (!response.ok) {
+            throw new Error(`Network error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (!data || typeof data.success === 'undefined') {
+            throw new Error('Invalid response format');
+        }
+
+        return {
+            success: data.success,
+            message: data.detail ? `${data.message} ${data.detail}` : data.message,
+        };
+    }
+
+    /**
+     * Toggle spinner and submit button
+     * @param {boolean} isLoading
+     */
+    function toggleLoading(isLoading) {
+        spinner.classList.toggle('d-none', !isLoading);
+        submitButton.disabled = isLoading;
+    }
+
+    /**
+     * Show Bootstrap alert
+     * @param {string} message
+     * @param {string} type 'success' | 'danger'
+     */
+    function showAlert(message, type = 'danger') {
         alertContainer.className = `alert alert-${type}`;
         alertContainer.textContent = message;
         alertContainer.classList.remove('d-none');
