@@ -1,107 +1,118 @@
 # Contact-Form-PHP
 
-[![version](https://img.shields.io/badge/version-1.4.0-blue.svg)](https://github.com/raspgot/Contact-Form-PHP) [![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP) [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed) [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
+[![version](https://img.shields.io/badge/version-1.4.0-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
+[![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP)
+[![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)
+[![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
 
-A modern, simple, and secure contact form built with Bootstrap, featuring AJAX submission. This project includes both PHP and JavaScript input validation, SMTP email sending using PHPMailer, rejection of invalid domains, and integration with Google reCAPTCHA v3. All of this is implemented **without any jQuery dependency**!
+A **modern**, **lightweight**, and **secure** contact form built with PHP and Bootstrap 5 — powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**, with **zero jQuery dependency**.
 
 ![Demo](https://github.raspgot.fr/gif_github_1.2.0.gif)
 
 ---
 
-## Live Demo
+## 🚀 Live Demo
 
-Experience the live demo here: [Contact-Form-PHP Live Demo](https://github.raspgot.fr)
-
----
-
-## Features
-
--   **PHP 8.4** – Compatible with the latest PHP versions ([supported versions](https://www.php.net/supported-versions.php))
--   **Bootstrap 5** – Modern and responsive design
--   **AJAX Submission** – Seamless asynchronous form handling
--   **Google reCAPTCHA v3** – Advanced spam protection
--   **PHPMailer SMTP Authentication** – Secure email delivery
--   **Client-side and Server-side Validation** – Ensures data integrity through robust JavaScript and PHP validation
+🔗 [Try the demo](https://github.raspgot.fr)
 
 ---
 
-## Installation
+## ✨ Features
 
-Clone the repository or [download it directly](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip):
+-   ✅ **PHP 8.4+** support
+-   🎨 **Bootstrap 5** UI – Responsive and clean
+-   ⚙️ **AJAX-based form submission** – No page reloads
+-   🔐 **Google reCAPTCHA v3** – Prevent spam without hassle
+-   📬 **PHPMailer with SMTP Auth** – Secure email delivery
+-   🛡️ **Client-side + Server-side Validation** – Double-layered validation
+-   🐞 **Bot Protection** – Includes honeypot field to trap bots
+
+---
+
+## 📦 Installation
+
+Clone the repository or download it manually:
 
 ```bash
 git clone https://github.com/raspgot/Contact-Form-PHP.git
 ```
 
-For your local setup, you can use [XAMPP](https://www.apachefriends.org).
+Run it locally using something like [XAMPP](https://www.apachefriends.org) or [MAMP](https://www.mamp.info).
 
 ---
 
-## Configuration
+## ⚙️ Configuration
 
-Before going live, configure your SMTP and Google reCAPTCHA settings.
+Before deploying, update your SMTP and reCAPTCHA credentials.
 
-### SMTP & reCAPTCHA Settings
+### 1. SMTP & reCAPTCHA Configuration
 
 Obtain your reCAPTCHA keys from: [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
-
-In your PHP configuration file, update the following constants:
+Update the following constants in `AjaxForm.php`:
 
 ```php
-const SMTP_HOST     = ''; // Your SMTP server address
-const SMTP_USERNAME = ''; // Your SMTP username
-const SMTP_PASSWORD = ''; // Your SMTP password
-const SECRET_KEY    = ''; // Your Google reCAPTCHA v3 secret key
+const SMTP_HOST     = 'your.smtp.com';
+const SMTP_USERNAME = 'your@email.com';
+const SMTP_PASSWORD = 'yourpassword';
+const SECRET_KEY    = 'your_recaptcha_secret_key';
 ```
 
-### Updating the reCAPTCHA Key in JavaScript
+> ℹ️ Ensure `php_curl` is enabled in your `php.ini`:
+>
+> ```ini
+> extension=curl
+> ```
 
-In the **AjaxForm.js** file, replace the placeholder with your reCAPTCHA site key:
+### 2. Frontend reCAPTCHA Setup
 
-```javascript
-const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
+Replace the site key in `AjaxForm.js`:
+
+```js
+const RECAPTCHA_SITE_KEY = 'your_recaptcha_site_key';
 ```
 
-### Integrating the reCAPTCHA Script
-
-Add the following script in your **index.html** file to load the Google reCAPTCHA API:
+And update your `index.html` to include the reCAPTCHA script:
 
 ```html
-<script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=your_recaptcha_site_key"></script>
 ```
 
-### Customizing Error Messages
+---
 
-Error and validation messages can be customized directly in your HTML:
+## 🛠️ Customization
+
+### Customizing Feedback Messages
+
+Update validation messages in your HTML:
 
 ```html
-<div class="valid-feedback">Looks good!</div>
+<div class="valid-feedback">Looks good !</div>
 <div class="invalid-feedback">Please provide a valid name.</div>
 ```
 
-**Important:** Ensure the cURL extension is enabled in your `php.ini` file:
+### Changing Form Fields
 
-```ini
-extension=curl;
-```
+Form elements are located in `index.html`, styled with Bootstrap 5. You can add more fields (e.g., subject, phone) and handle them in `AjaxForm.php`.
 
 ---
 
-## Contributions
+## 🤝 Contributing
 
-Contributions are welcome! Feel free to submit a pull request or open an issue to discuss ideas for improvements.
+All contributions are welcome — bug fixes, feature ideas, improvements, or documentation updates !
 
 ---
 
-## Author
+## 👨‍💻 Author
 
 ![Logo](https://github.raspgot.fr/raspgot-blue.png)
 
-Developed by [Raspgot](https://raspgot.fr). Visit my portfolio and give this repo a star if you like the project 🤖
+Developed with ❤️ by [Raspgot](https://raspgot.fr)
+
+If you find this useful, ⭐️ star the repo !
 
 ---
 
-## Dependencies
+## 📚 Dependencies
 
 -   [PHPMailer](https://github.com/PHPMailer/PHPMailer)
 -   [Bootstrap](https://github.com/twbs/bootstrap)
