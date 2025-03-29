@@ -47,7 +47,7 @@ Before deploying, update your SMTP and reCAPTCHA credentials.
 
 ### 1. SMTP & reCAPTCHA Configuration
 
-Obtain your reCAPTCHA keys from: [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
+Obtain your reCAPTCHA keys from: [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)  
 Update the following constants in `AjaxForm.php`:
 
 ```php
