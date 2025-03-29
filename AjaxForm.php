@@ -75,25 +75,32 @@ $email_body = sprintf(
     <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>%s</title>
     </head>
-    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
-        <table width="100%%" cellpadding="0" cellspacing="0" border="0">
+    <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;">
+        <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" border="0">
             <tr>
-                <td align="center">
-                    <table width="600" cellpadding="20" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <td align="center" style="padding: 30px 15px;">
+                    <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                         <tr>
-                            <td align="center" style="font-size: 24px; color: #333333;">
-                                <strong>%s</strong>
+                            <td style="background-color: #4a90e2; color: #ffffff; padding: 30px; text-align: center; font-size: 28px; font-weight: bold;">
+                                %s
                             </td>
                         </tr>
                         <tr>
-                            <td style="color: #555555; line-height: 1.5;">
-                                <p style="margin: 12px 0;"><strong>Date:</strong> %s</p>
-                                <p style="margin: 12px 0;"><strong>Name:</strong> %s</p>
-                                <p style="margin: 12px 0;"><strong>Email:</strong> %s</p>
-                                <p style="margin: 12px 0;"><strong>Message:</strong><br>%s</p>
-                                <p style="margin: 12px 0;"><strong>IP:</strong> %s</p>
+                            <td style="padding: 30px; color: #333333; font-size: 16px; line-height: 1.6;">
+                                <p style="margin: 0 0 15px;"><strong>Date:</strong> %s</p>
+                                <p style="margin: 0 0 15px;"><strong>Name:</strong> %s</p>
+                                <p style="margin: 0 0 15px;"><strong>Email:</strong> <a href="mailto:%s" style="color: #4a90e2; text-decoration: none;">%s</a></p>
+                                <p style="margin: 0 0 15px;"><strong>Message:</strong><br>%s</p>
+                                <hr style="border: none; border-top: 1px solid #dddddd; margin: 30px 0;">
+                                <p style="margin: 0; font-size: 14px; color: #888888;"><strong>IP:</strong> %s</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="background-color: #f9f9f9; text-align: center; padding: 15px; font-size: 12px; color: #aaaaaa;">
+                                This email was generated automatically. Please do not reply.
                             </td>
                         </tr>
                     </table>
@@ -104,8 +111,9 @@ $email_body = sprintf(
     </html>',
     EMAIL_SUBJECT,
     EMAIL_SUBJECT,
-    $date->format('j/m/Y H:i:s'),
+    $date->format('m/d/Y H:i:s'),
     $name,
+    $email,
     $email,
     nl2br($message),
     $ip
