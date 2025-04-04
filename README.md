@@ -9,8 +9,6 @@ A **modern**, **lightweight**, and **secure** contact form built with PHP and Bo
 
 ![Demo](https://github.raspgot.fr/gif_github_1.2.0.gif)
 
----
-
 ## 🚀 Live Demo
 
 🔗 [Try the demo](https://github.raspgot.fr)
