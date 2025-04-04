@@ -31,7 +31,7 @@ A **modern**, **lightweight**, and **secure** contact form built with PHP and Bo
 
 ## 📦 Quick Installation
 
-1. **Clone or [download](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip) the repository:**
+1. **Clone or [download](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip) the repository :**
 
 ```bash
 git clone https://github.com/raspgot/Contact-Form-PHP.git
@@ -48,7 +48,7 @@ Before deploying, update your SMTP and reCAPTCHA credentials.
 ### 1. SMTP & reCAPTCHA Configuration
 
 -   Get your reCAPTCHA keys from [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
--   Then, update the following constants in `AjaxForm.php`:
+-   Then, update the following constants in `AjaxForm.php` :
 
 ```php
 const SMTP_HOST     = 'your.smtp.com';
@@ -57,7 +57,7 @@ const SMTP_PASSWORD = 'yourpassword';
 const SECRET_KEY    = 'your_recaptcha_secret_key';
 ```
 
-> ℹ️ Ensure `php_curl` is enabled in your `php.ini`:
+> ℹ️ Ensure `php_curl` is enabled in your `php.ini` :
 >
 > ```ini
 > extension=curl
@@ -65,13 +65,13 @@ const SECRET_KEY    = 'your_recaptcha_secret_key';
 
 ### 2. Frontend reCAPTCHA Setup
 
-Replace the site key in `AjaxForm.js`:
+Replace the site key in `AjaxForm.js` :
 
 ```js
 const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
 ```
 
--   Add the reCAPTCHA script to `index.html` (just before `</body>`):
+-   Add the reCAPTCHA script to `index.html` (just before `</body>`) :
 
 ```html
 <script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
@@ -83,7 +83,7 @@ const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
 
 ### Editing Validation Messages
 
-You can customize the success and error messages in the HTML:
+You can customize the success and error messages in the HTML :
 
 ```html
 <div class="valid-feedback">Looks good !</div>
@@ -92,15 +92,15 @@ You can customize the success and error messages in the HTML:
 
 ### Adding More Fields
 
-To add custom fields (e.g. subject, phone number):
+To add custom fields (e.g. subject, phone number) :
 
-1. Add them to `index.html`:
+1. Add them to `index.html` :
 
 ```html
 <input type="text" name="subject" class="form-control" required />
 ```
 
-2. Handle them in `AjaxForm.php`:
+2. Handle them in `AjaxForm.php` :
 
 ```php
 $subject = $_POST['subject'] ?? '';
