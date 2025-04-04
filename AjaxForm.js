@@ -1,121 +1,93 @@
 /**
- * .checkValidity | https://getbootstrap.com/docs/5.3/forms/validation
- * FormData       | https://developer.mozilla.org/en-US/docs/Web/API/FormData
- * fetch          | https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
- * reCaptcha v3   | https://developers.google.com/recaptcha/docs/v3
+ * Form Validation: https://getbootstrap.com/docs/5.3/forms/validation
+ * FormData API:    https://developer.mozilla.org/en-US/docs/Web/API/FormData
+ * Fetch API:       https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+ * reCaptcha v3:    https://developers.google.com/recaptcha/docs/v3
  *
  * Author: Raspgot
  */
 
 const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY'; // Replace with your reCAPTCHA public key
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
+    // Select the form element with Bootstrap validation class
     const form = document.querySelector('.needs-validation');
-    if (!form) return;
+    if (!form) return; // Exit if no form found
 
-    const spinner        = document.getElementById('loading-spinner');
-    const submitButton   = form.querySelector('button[type="submit"]');
+    // Select DOM elements: spinner, submit button and alert container
+    const spinner = document.getElementById('loading-spinner');
+    const submitButton = form.querySelector('button[type="submit"]');
     const alertContainer = document.getElementById('alert-status');
 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+    // Add custom submit event listener to the form
+    form.addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent default form submission
+        event.stopPropagation(); // Stop event from bubbling up
 
+        // Add Bootstrap class to show validation feedback
         form.classList.add('was-validated');
 
+        // If the form is invalid, focus the first invalid field and stop
         if (!form.checkValidity()) {
-            const firstInvalid = form.querySelector(':invalid');
-            if (firstInvalid) firstInvalid.focus();
+            const firstInvalidField = form.querySelector(':invalid');
+            if (firstInvalidField) firstInvalidField.focus();
             return;
         }
 
-        toggleLoading(true);
+        // Show loading spinner and disable submit button
+        spinner.classList.remove('d-none');
+        submitButton.disabled = true;
 
-        try {
-            const token = await getRecaptchaToken();
-            const formData = new FormData(form);
-            formData.append('recaptcha_token', token);
+        // Wait for reCaptcha to be ready
+        grecaptcha.ready(function () {
+            // Execute reCaptcha v3 to get the token
+            grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' }).then(function (token) {
+                // Create FormData object from form fields
+                const formData = new FormData(form);
+                // Append the reCaptcha token to form data
+                formData.append('recaptcha_token', token);
 
-            const response = await fetch('AjaxForm.php', {
-                method: 'POST',
-                body: formData,
-            });
+                // Send the form data to the server using Fetch API
+                fetch('AjaxForm.php', {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(function (response) {
+                        // Handle HTTP-level errors
+                        if (!response.ok) {
+                            throw new Error('Network error: ' + response.status);
+                        }
+                        return response.json(); // Parse the response as JSON
+                    })
+                    .then(function (result) {
+                        // Compose the alert message from result
+                        const message = result.detail ? result.message + ' ' + result.detail : result.message;
+                        const alertType = result.success ? 'success' : 'danger'; // Set alert class based on status
 
-            const data = await handleResponse(response);
-            showAlert(data.message, data.success ? 'success' : 'danger');
+                        // Show alert with response message
+                        alertContainer.className = 'alert alert-' + alertType;
+                        alertContainer.textContent = message;
+                        alertContainer.classList.remove('d-none');
+                        alertContainer.scrollIntoView({ behavior: 'smooth' });
 
-            if (data.success) {
-                form.reset();
-                form.classList.remove('was-validated');
-            }
-        } catch (error) {
-            console.error('Submission error:', error);
-            showAlert('An error occurred, please try again.', 'danger');
-        } finally {
-            toggleLoading(false);
-        }
-    });
-
-    /**
-     * Get reCAPTCHA v3 token
-     * @returns {Promise<string>}
-     */
-    function getRecaptchaToken() {
-        return new Promise((resolve) => {
-            grecaptcha.ready(() => {
-                grecaptcha
-                    .execute(RECAPTCHA_SITE_KEY, { action: 'submit' })
-                    .then(resolve)
-                    .catch((error) => {
-                        console.error('reCAPTCHA error:', error);
-                        showAlert('reCAPTCHA verification failed.', 'danger');
-                        toggleLoading(false);
+                        // If the form submission was successful, reset the form
+                        if (result.success) {
+                            form.reset();
+                            form.classList.remove('was-validated');
+                        }
+                    })
+                    .catch(function (error) {
+                        // Log any network or parsing errors
+                        console.error('An error occurred:', error);
+                    })
+                    .finally(function () {
+                        // Hide spinner and re-enable submit button
+                        spinner.classList.add('d-none');
+                        submitButton.disabled = false;
                     });
             });
         });
-    }
-
-    /**
-     * Handle fetch response
-     * @param {Response} response
-     * @returns {Promise<Object>}
-     */
-    async function handleResponse(response) {
-        if (!response.ok) {
-            throw new Error(`Network error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (!data || typeof data.success === 'undefined') {
-            throw new Error('Invalid response format');
-        }
-
-        return {
-            success: data.success,
-            message: data.detail ? `${data.message} ${data.detail}` : data.message,
-        };
-    }
-
-    /**
-     * Toggle spinner and submit button
-     * @param {boolean} isLoading
-     */
-    function toggleLoading(isLoading) {
-        spinner.classList.toggle('d-none', !isLoading);
-        submitButton.disabled = isLoading;
-    }
-
-    /**
-     * Show Bootstrap alert
-     * @param {string} message
-     * @param {string} type 'success' | 'danger'
-     */
-    function showAlert(message, type = 'danger') {
-        alertContainer.className = `alert alert-${type}`;
-        alertContainer.textContent = message;
-        alertContainer.classList.remove('d-none');
-        alertContainer.scrollIntoView({ behavior: 'smooth' });
-    }
+    });
 });
