@@ -19,25 +19,25 @@ A **modern**, **lightweight**, and **secure** contact form built with PHP and Bo
 
 ## ✨ Features
 
--   ✅ **PHP 8.4+** support
--   🎨 **Bootstrap 5** UI – Responsive and clean
--   ⚙️ **AJAX-based form submission** – No page reloads
--   🔐 **Google reCAPTCHA v3** – Prevent spam without hassle
--   📬 **PHPMailer with SMTP Auth** – Secure email delivery
--   🛡️ **Client-side + Server-side Validation** – Double-layered validation
--   🐞 **Bot Protection** – Includes honeypot field to trap bots
+-   **PHP 8.4+** support
+-   **Bootstrap 5** UI – Responsive and clean
+-   **AJAX-based form submission** – No page reloads
+-   **Google reCAPTCHA v3** – Prevent spam without hassle
+-   **PHPMailer with SMTP Auth** – Secure email delivery
+-   **Client-side + Server-side Validation** – Double-layered validation
+-   **Bot Protection** – Includes honeypot field to trap bots
 
 ---
 
-## 📦 Installation
+## 📦 Quick Installation
 
-Clone the repository or download it manually:
+1. **Clone or [download](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip) the repository:**
 
 ```bash
 git clone https://github.com/raspgot/Contact-Form-PHP.git
 ```
 
-Run it locally using something like [XAMPP](https://www.apachefriends.org) or [MAMP](https://www.mamp.info).
+2. **Run it locally** with a local server like [XAMPP](https://www.apachefriends.org)
 
 ---
 
@@ -47,8 +47,8 @@ Before deploying, update your SMTP and reCAPTCHA credentials.
 
 ### 1. SMTP & reCAPTCHA Configuration
 
-Obtain your reCAPTCHA keys from: [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
-Update the following constants in `AjaxForm.php`:
+-   Get your reCAPTCHA keys from [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
+-   Then, update the following constants in `AjaxForm.php`:
 
 ```php
 const SMTP_HOST     = 'your.smtp.com';
@@ -68,51 +68,65 @@ const SECRET_KEY    = 'your_recaptcha_secret_key';
 Replace the site key in `AjaxForm.js`:
 
 ```js
-const RECAPTCHA_SITE_KEY = 'your_recaptcha_site_key';
+const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
 ```
 
-And update your `index.html` to include the reCAPTCHA script:
+-   Add the reCAPTCHA script to `index.html` (just before `</body>`):
 
 ```html
-<script src="https://www.google.com/recaptcha/api.js?render=your_recaptcha_site_key"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
 ```
 
 ---
 
 ## 🛠️ Customization
 
-### Customizing Feedback Messages
+### Editing Validation Messages
 
-Update validation messages in your HTML:
+You can customize the success and error messages in the HTML:
 
 ```html
 <div class="valid-feedback">Looks good !</div>
 <div class="invalid-feedback">Please provide a valid name.</div>
 ```
 
-### Changing Form Fields
+### Adding More Fields
 
-Form elements are located in `index.html`, styled with Bootstrap 5. You can add more fields (e.g., subject, phone) and handle them in `AjaxForm.php`.
+To add custom fields (e.g. subject, phone number):
+
+1. Add them to `index.html`:
+
+```html
+<input type="text" name="subject" class="form-control" required />
+```
+
+2. Handle them in `AjaxForm.php`:
+
+```php
+$subject = $_POST['subject'] ?? '';
+```
+
+3. Include them in the email body or validation as needed.
 
 ---
 
 ## 🤝 Contributing
 
-All contributions are welcome — bug fixes, feature ideas, improvements, or documentation updates !
+Got a bug, idea, or suggestion? Contributions are very welcome !
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 ![Logo](https://github.raspgot.fr/raspgot-blue.png)
 
-Developed with ❤️ by [Raspgot](https://raspgot.fr)
+Developed with ❤️ by [**Raspgot**](https://raspgot.fr)
 
-If you find this useful, ⭐️ star the repo !
+If you found this project helpful, ⭐️ star the repo !
 
 ---
 
-## 📚 Dependencies
+## Dependencies
 
 -   [PHPMailer](https://github.com/PHPMailer/PHPMailer)
 -   [Bootstrap](https://github.com/twbs/bootstrap)
