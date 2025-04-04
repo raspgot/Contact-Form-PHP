@@ -92,7 +92,7 @@ $email_body = '<!DOCTYPE html>
         <title>' . EMAIL_SUBJECT . '</title>
     </head>
     <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif">
-        <table width="100%%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f4f4f4">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f4f4f4">
             <tr>
                 <td align="center" style="padding: 30px 15px">
                     <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0">
@@ -134,6 +134,7 @@ try {
 
     // Set sender and recipient
     $mail->setFrom(SMTP_USERNAME, FROM_NAME);
+    $mail->Sender = $SMTP_USERNAME;
     $mail->addAddress($email, $name);
     $mail->addBCC(SMTP_USERNAME, 'Admin');
     $mail->addReplyTo($email, $name);
