@@ -7,7 +7,7 @@
 
 A **modern**, **lightweight**, and **secure** contact form built with PHP and Bootstrap 5 — powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**, with **zero jQuery dependency**.
 
-![Demo](https://github.raspgot.fr/gif_github_1.2.0.gif)
+![Demo](https://github.raspgot.fr/contact-form-raspgot.gif)
 
 ## 🚀 Live Demo
 
