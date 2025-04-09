@@ -136,7 +136,7 @@ try {
     $mail->setFrom(SMTP_USERNAME, FROM_NAME);
     $mail->Sender = $SMTP_USERNAME;
     $mail->addAddress($email, $name);
-    $mail->addBCC(SMTP_USERNAME, 'Admin');
+    $mail->addCC(SMTP_USERNAME, 'Admin');
     $mail->addReplyTo($email, $name);
 
     // Email content
