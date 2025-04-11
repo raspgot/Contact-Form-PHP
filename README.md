@@ -101,10 +101,10 @@ To add custom fields (e.g. subject, phone number) :
 2. Handle them in `AjaxForm.php` :
 
 ```php
-$subject = $_POST['subject'] ?? '';
+$subject = sanitize($_POST['subject']) ?? '';
 ```
 
-3. Include them in the email body or validation as needed.
+3. Include them in the email body and validation.
 
 ---
 
