@@ -5,7 +5,7 @@
 [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
 
-A **modern**, **lightweight**, and **secure** contact form built with PHP and Bootstrap 5 — powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**, with **zero jQuery dependency**.
+A **modern**, **lightweight**, and **secure** contact form built with PHP and Bootstrap 5 — powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**, with **zero jQuery dependency**
 
 ![Demo](https://github.raspgot.fr/contact-form-raspgot.gif)
 
@@ -41,7 +41,7 @@ git clone https://github.com/raspgot/Contact-Form-PHP.git
 
 ## ⚙️ Configuration
 
-Before deploying, update your SMTP and reCAPTCHA credentials.
+Before deploying, update your SMTP and reCAPTCHA credentials
 
 ### 1. SMTP & reCAPTCHA Configuration
 
@@ -104,7 +104,7 @@ To add custom fields (e.g. subject, phone number) :
 $subject = sanitize($_POST['subject']) ?? '';
 ```
 
-3. Include them in the email body and validation.
+3. Include them in the email body and validation
 
 ---
 
