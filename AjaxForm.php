@@ -102,7 +102,7 @@ $email_body = '<!DOCTYPE html>
                         <tr>
                             <td style="padding: 24px; color: #333333; font-size: 16px; line-height: 1.5">
                                 <p style="margin: 0 0 12px"><strong>Date</strong><br />' . $date->format('m/d/Y H:i:s') . '</p>
-                                <p style="margin: 0 0 12px"><strong>Name</strong><br />' . $name .'</p>
+                                <p style="margin: 0 0 12px"><strong>Name</strong><br />' . $name . '</p>
                                 <p style="margin: 0 0 12px"><strong>Email</strong><br /><a href="mailto:' . $email . '" style="color: #4a90e2; text-decoration: none">' . $email . '</a></p>
                                 <p style="margin: 0 0 12px"><strong>Message</strong><br />' . $message . '</p>
                                 <hr style="border: none; border-top: 1px solid #dddddd; margin: 24px 0" />
@@ -194,15 +194,21 @@ function validateRecaptcha(string $token): void
 }
 
 /**
- * Sanitize input to prevent header injection and XSS
+ * Sanitize input to prevent header injection, XSS, and control characters
  *
  * @param string $data Raw input string
- * @return string Cleaned and safe input
+ * @return string Sanitized and safe string
  */
 function sanitize(string $data): string
 {
-    $data = preg_replace('/[\r\n]+/', ' ', $data); // Prevent email header injection
-    return trim(htmlspecialchars($data, ENT_QUOTES, 'UTF-8')); // Escape HTML
+    // Remove null bytes and other control characters (except \t)
+    $data = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/u', '', $data);
+
+    // Prevent header injection by replacing line breaks with spaces
+    $data = preg_replace('/\r|\n/', ' ', $data);
+
+    // Escape HTML entities (with strict quote handling and UTF-8 safety)
+    return trim(htmlspecialchars($data, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8', true));
 }
 
 /**
