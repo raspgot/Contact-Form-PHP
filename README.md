@@ -40,7 +40,7 @@ Or [download as ZIP](https://github.com/raspgot/Contact-Form-PHP/archive/master.
 
 ### 2. Run locally
 
-Use a local PHP server like [XAMPP](https://www.apachefriends.org), [MAMP](https://www.mamp.info), or the built-in PHP server:
+Use a local PHP server like [XAMPP](https://www.apachefriends.org), [MAMP](https://www.mamp.info) or the built-in PHP server:
 
 ```bash
 php -S localhost:8000
