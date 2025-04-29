@@ -84,40 +84,14 @@ if (!checkdnsrr($domain, "MX") && !checkdnsrr($domain, "A")) {
 validateRecaptcha($token);
 
 // Construct the HTML email content
-$email_body = '<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>' . EMAIL_SUBJECT . '</title>
-    </head>
-    <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f4f4f4">
-            <tr>
-                <td align="center" style="padding: 30px 15px">
-                    <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0">
-                        <tr>
-                            <td bgcolor="#4a90e2" style="padding: 24px; text-align: center; color: #ffffff; font-size: 24px; font-weight: bold">' . EMAIL_SUBJECT . '</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 24px; color: #333333; font-size: 16px; line-height: 1.5">
-                                <p style="margin: 0 0 12px"><strong>Date</strong><br />' . $date->format('m/d/Y H:i:s') . '</p>
-                                <p style="margin: 0 0 12px"><strong>Name</strong><br />' . $name . '</p>
-                                <p style="margin: 0 0 12px"><strong>Email</strong><br /><a href="mailto:' . $email . '" style="color: #4a90e2; text-decoration: none">' . $email . '</a></p>
-                                <p style="margin: 0 0 12px"><strong>Message</strong><br />' . $message . '</p>
-                                <hr style="border: none; border-top: 1px solid #dddddd; margin: 24px 0" />
-                                <p style="font-size: 14px; color: #888888; margin: 0"><strong>IP: </strong>' . $ip . '</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td bgcolor="#f4f4f4" style="padding: 16px; text-align: center; font-size: 12px; color: #aaaaaa">This email was generated automatically.</td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    </body>
-</html>';
+$email_body = render_email([
+    'subject' => EMAIL_SUBJECT,
+    'date'    => $date->format('m/d/Y H:i:s'),
+    'name'    => $name,
+    'email'   => $email,
+    'message' => $message,
+    'ip'      => $ip,
+]);
 
 // Send the email using PHPMailer
 $mail = new PHPMailer(true);
@@ -134,7 +108,7 @@ try {
 
     // Set sender and recipient
     $mail->setFrom(SMTP_USERNAME, FROM_NAME);
-    $mail->Sender = $SMTP_USERNAME;
+    $mail->Sender = SMTP_USERNAME;
     $mail->addAddress($email, $name);
     $mail->addCC(SMTP_USERNAME, 'Admin');
     $mail->addReplyTo($email, $name);
@@ -226,4 +200,28 @@ function respond(bool $success, string $message, mixed $detail = null): void
         'detail'  => $detail,
     ]);
     exit;
+}
+
+/**
+ * Generates the HTML email content using a PHP template and provided data.
+ *
+ * @param array $data Array containing the required variables for the template
+ * @return string The complete rendered HTML content
+ */
+function render_email(array $data): string
+{
+    // Path to the email template (adjustable if needed)
+    $templateFile = __DIR__ . '/email_template.php';
+
+    if (!is_file($templateFile)) {
+        throw new RuntimeException("Template file not found: $templateFile");
+    }
+
+    // Encapsulate in a local scope to avoid variable pollution
+    return (function () use ($data, $templateFile): string {
+        extract($data, EXTR_SKIP); // convert array keys into local variables
+        ob_start();
+        require $templateFile;
+        return ob_get_clean();
+    })();
 }
