@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Simple bot detection based on the user-agent string
-if (empty($_SERVER['HTTP_USER_AGENT']) || preg_match('/curl|bot|spider|crawler/i', $_SERVER['HTTP_USER_AGENT'])) {
+if (empty($_SERVER['HTTP_USER_AGENT']) || preg_match('/\b(curl|wget|httpie|python-requests|httpclient|bot|spider|crawler|scrapy)\b/i', $_SERVER['HTTP_USER_AGENT'])) {
     respond(false, EMAIL_MESSAGES['honeypot_error']);
 }
 
