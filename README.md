@@ -5,48 +5,58 @@
 [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
 
-A **modern**, **lightweight**, and **secure** contact form built with PHP and Bootstrap 5 — powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**, with **zero jQuery dependency**
+A **modern**, **lightweight**, and **secure** contact form built with PHP and Bootstrap 5 — powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**.  
+✅ No jQuery, no fluff — just fast and functional.
 
 ![Demo](https://github.raspgot.fr/contact-form-raspgot.gif)
 
 ## 🚀 Live Demo
 
-🔗 [Try the demo](https://github.raspgot.fr)
+🔗 [Try the live demo](https://github.raspgot.fr)
 
 ---
 
 ## ✨ Features
 
 -   **PHP 8.4+** support
--   **Bootstrap 5** UI – Responsive and clean
--   **AJAX-based form submission** – No page reloads
--   **Google reCAPTCHA v3** – Prevent spam without hassle
--   **PHPMailer with SMTP Auth** – Secure email delivery
--   **Client-side + Server-side Validation** – Double-layered validation
--   **Bot Protection** – Includes honeypot field to trap bots
+-   **Bootstrap 5** UI – Clean, responsive and accessible
+-   **AJAX form submission** – Smooth UX with no page reload
+-   **Google reCAPTCHA v3** – Silent spam protection
+-   **PHPMailer with SMTP Auth** – Reliable and secure email delivery
+-   **Client-side & Server-side Validation** – Better security and UX
+-   **Bot Trap (Honeypot)** – Simple yet effective spam mitigation
 
 ---
 
-## 📦 Quick Installation
+## 📦 Quick Start
 
-1. **Clone or [download](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip) the repository :**
+### 1. Clone the repo
 
 ```bash
 git clone https://github.com/raspgot/Contact-Form-PHP.git
 ```
 
-2. **Run it locally** with a local server like [XAMPP](https://www.apachefriends.org)
+Or [download as ZIP](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip).
+
+### 2. Run locally
+
+Use a local PHP server like [XAMPP](https://www.apachefriends.org), [MAMP](https://www.mamp.info), or the built-in PHP server:
+
+```bash
+php -S localhost:8000
+```
 
 ---
 
 ## ⚙️ Configuration
 
-Before deploying, update your SMTP and reCAPTCHA credentials
+Before deployment, make sure to configure SMTP and reCAPTCHA credentials.
 
-### 1. SMTP & reCAPTCHA Configuration
+### 1. Set SMTP & reCAPTCHA secrets
 
--   Get your reCAPTCHA keys from [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin)
--   Then, update the following constants in `AjaxForm.php` :
+Get your reCAPTCHA keys from [Google reCAPTCHA Admin Panel](https://www.google.com/recaptcha/admin)
+
+Update the constants in `AjaxForm.php`:
 
 ```php
 const SMTP_HOST     = 'your.smtp.com';
@@ -55,21 +65,21 @@ const SMTP_PASSWORD = 'yourpassword';
 const SECRET_KEY    = 'your_recaptcha_secret_key';
 ```
 
-> ℹ️ Ensure `php_curl` is enabled in your `php.ini` :
+> ℹ️ Make sure the `php_curl` extension is enabled in `php.ini`:
 >
 > ```ini
 > extension=curl
 > ```
 
-### 2. Frontend reCAPTCHA Setup
+### 2. Update frontend reCAPTCHA key
 
-Replace the site key in `AjaxForm.js` :
+In `AjaxForm.js`, set your site key:
 
 ```js
 const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
 ```
 
--   Add the reCAPTCHA script to `index.html` (just before `</body>`) :
+And include the script at the end of `index.html`, before `</body>`:
 
 ```html
 <script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
@@ -79,38 +89,39 @@ const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
 
 ## 🛠️ Customization
 
-### Editing Validation Messages
+### ✏️ Edit Validation Messages
 
-You can customize the success and error messages in the HTML :
+Change messages directly in the HTML:
 
 ```html
 <div class="valid-feedback">Looks good !</div>
 <div class="invalid-feedback">Please provide a valid name.</div>
 ```
 
-### Adding More Fields
+### ➕ Add Custom Fields
 
-To add custom fields (e.g. subject, phone number) :
+To add fields like subject or phone number:
 
-1. Add them to `index.html` :
+1. Add them in `index.html`:
 
 ```html
 <input type="text" name="subject" class="form-control" required />
 ```
 
-2. Handle them in `AjaxForm.php` :
+2. Handle them in `AjaxForm.php`:
 
 ```php
 $subject = sanitize($_POST['subject']) ?? '';
 ```
 
-3. Include them in the email body and validation
+3. Add validation + include them in the email body
 
 ---
 
-## 🤝 Contributing
+## 🙌 Contributing
 
-Got a bug, idea, or suggestion? Contributions are very welcome !
+Found a bug ? Have a suggestion or improvement ?  
+Contributions, pull requests, and feedback are welcome !
 
 ---
 
@@ -120,7 +131,7 @@ Got a bug, idea, or suggestion? Contributions are very welcome !
 
 Developed with ❤️ by [**Raspgot**](https://raspgot.fr)
 
-If you found this project helpful, ⭐️ star the repo !
+If you find this project helpful, don't forget to ⭐️ star the repo !
 
 ---
 
