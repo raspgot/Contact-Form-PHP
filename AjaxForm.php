@@ -89,7 +89,7 @@ $email_body = render_email([
     'date'    => $date->format('m/d/Y H:i:s'),
     'name'    => $name,
     'email'   => $email,
-    'message' => $message,
+    'message' => nl2br($message),
     'ip'      => $ip,
 ]);
 
@@ -177,9 +177,6 @@ function sanitize(string $data): string
 {
     // Remove null bytes and other control characters (except \t)
     $data = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/u', '', $data);
-
-    // Prevent header injection by replacing line breaks with spaces
-    $data = preg_replace('/\r|\n/', ' ', $data);
 
     // Escape HTML entities (with strict quote handling and UTF-8 safety)
     return trim(htmlspecialchars($data, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8', true));
