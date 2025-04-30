@@ -30,7 +30,7 @@ Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reC
 
 ---
 
-### Want even better spam protection?
+### Want even better spam protection ?
 
 ✅ Regex-enhanced bot detection  
 ✅ DNS email domain validation  
