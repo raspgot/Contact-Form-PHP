@@ -35,7 +35,8 @@ Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reC
 ✅ Regex-enhanced bot detection  
 ✅ DNS email domain validation  
 ✅ Honeypot field  
-✅ reCAPTCHA score filtering
+✅ reCAPTCHA score filtering  
+✅ rate limiting using sessions (3 submissions per hour)
 
 ---
 

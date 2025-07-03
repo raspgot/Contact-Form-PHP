@@ -6,7 +6,7 @@
  *
  * @see      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
  * @package  PHPMailer
- * @version  1.6.0
+ * @version  1.6.1
  */
 
 declare(strict_types=1);
@@ -35,49 +35,53 @@ const FROM_NAME      = 'Raspgot';                // Sender name
 const EMAIL_SUBJECT  = '[Github] New message !'; // Subject for outgoing emails
 
 // Predefined response messages
-const EMAIL_MESSAGES = [
-    'success'        => '✉️ Your message has been sent !',
-    'enter_name'     => '⚠️ Please enter your name.',
-    'enter_email'    => '⚠️ Please enter a valid email.',
-    'enter_message'  => '⚠️ Please enter your message.',
-    'token_error'    => '⚠️ No reCAPTCHA token received.',
-    'domain_error'   => '⚠️ The email domain is invalid.',
-    'method_error'   => '⚠️ Method not allowed.',
-    'constant_error' => '⚠️ Missing configuration constants.',
-    'honeypot_error' => '🚫 Spam detected.',
+const RESPONSES = [
+    'success'          => '✉️ Your message has been sent !',
+    'enter_name'       => '⚠️ Please enter your name.',
+    'enter_email'      => '⚠️ Please enter a valid email.',
+    'enter_message'    => '⚠️ Please enter your message.',
+    'token_error'      => '⚠️ No reCAPTCHA token received.',
+    'domain_error'     => '⚠️ The email domain is invalid.',
+    'method_error'     => '⚠️ Method not allowed.',
+    'constant_error'   => '⚠️ Missing configuration constants.',
+    'honeypot_error'   => '🚫 Spam detected.',
+    'limit_rate_error' => '🚫 Too many messages sent. Please wait before trying again.',
 ];
 
 // Ensure all necessary constants are set
 if (empty(SECRET_KEY) || empty(SMTP_HOST) || empty(SMTP_USERNAME) || empty(SMTP_PASSWORD)) {
-    respond(false, EMAIL_MESSAGES['constant_error']);
+    respond(false, RESPONSES['constant_error']);
 }
 
 // Allow only POST requests (reject GET or others)
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    respond(false, EMAIL_MESSAGES['method_error']);
+    respond(false, RESPONSES['method_error']);
 }
 
 // Simple bot detection based on the user-agent string
 if (empty($_SERVER['HTTP_USER_AGENT']) || preg_match('/\b(curl|wget|httpie|python-requests|httpclient|bot|spider|crawler|scrapy)\b/i', $_SERVER['HTTP_USER_AGENT'])) {
-    respond(false, EMAIL_MESSAGES['honeypot_error']);
+    respond(false, RESPONSES['honeypot_error']);
 }
+
+// Session rate-limiting: max 3 submissions per hour
+checkSessionRateLimit(3, 3600);
 
 // Gather and validate user input from POST data
 $date     = new DateTime();
 $ip       = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
-$email    = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL) ?: respond(false, EMAIL_MESSAGES['enter_email']);
-$name     = isset($_POST['name']) ? sanitize($_POST['name']) : respond(false, EMAIL_MESSAGES['enter_name']);
-$message  = isset($_POST['message']) ? sanitize($_POST['message']) : respond(false, EMAIL_MESSAGES['enter_message']);
-$token    = isset($_POST['recaptcha_token']) ? sanitize($_POST['recaptcha_token']) : respond(false, EMAIL_MESSAGES['token_error']);
+$email    = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL) ?: respond(false, RESPONSES['enter_email']);
+$name     = isset($_POST['name']) ? sanitize($_POST['name']) : respond(false, RESPONSES['enter_name']);
+$message  = isset($_POST['message']) ? sanitize($_POST['message']) : respond(false, RESPONSES['enter_message']);
+$token    = isset($_POST['recaptcha_token']) ? sanitize($_POST['recaptcha_token']) : respond(false, RESPONSES['token_error']);
 $honeypot = isset($_POST['website']) ? trim($_POST['website']) : '';
 if (!empty($honeypot)) {
-    respond(false, EMAIL_MESSAGES['honeypot_error']);
+    respond(false, RESPONSES['honeypot_error']);
 }
 
 // Check if the email domain is valid (DNS records)
 $domain = substr(strrchr($email, "@"), 1);
 if (!checkdnsrr($domain, "MX") && !checkdnsrr($domain, "A")) {
-    respond(false, EMAIL_MESSAGES['domain_error']);
+    respond(false, RESPONSES['domain_error']);
 }
 
 // Validate the reCAPTCHA token with Google
@@ -122,7 +126,7 @@ try {
 
     // Attempt to send email
     $mail->send();
-    respond(true, EMAIL_MESSAGES['success']);
+    respond(true, RESPONSES['success']);
 } catch (Exception $e) {
     // Catch errors and return the message
     respond(false, '❌ ' . $e->getMessage());
@@ -221,4 +225,34 @@ function render_email(array $data): string
         require $templateFile;
         return ob_get_clean();
     })();
+}
+
+/**
+ * Limits the number of form submissions per session.
+ *
+ * @param int $maxRequests Maximum allowed submissions
+ * @param int $period Time window in seconds (e.g., 3600 = 1 hour)
+ */
+function checkSessionRateLimit(int $maxRequests = 3, int $period = 3600): void
+{
+    $now = time();
+
+    // Initialize the session array if it doesn't exist yet
+    if (!isset($_SESSION['rate_limit_times'])) {
+        $_SESSION['rate_limit_times'] = [];
+    }
+
+    // Remove timestamps that are older than the allowed period
+    $_SESSION['rate_limit_times'] = array_filter(
+        $_SESSION['rate_limit_times'],
+        fn($timestamp) => $timestamp >= ($now - $period)
+    );
+
+    // Check if the number of submissions exceeds the limit
+    if (count($_SESSION['rate_limit_times']) >= $maxRequests) {
+        respond(false, RESPONSES['limit_rate_error']);
+    }
+
+    // Record the current submission time
+    $_SESSION['rate_limit_times'][] = $now;
 }
