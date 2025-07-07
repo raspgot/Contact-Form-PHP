@@ -1,8 +1,8 @@
 /**
- * Form Validation: https://getbootstrap.com/docs/5.3/forms/validation
- * FormData API:    https://developer.mozilla.org/en-US/docs/Web/API/FormData
- * Fetch API:       https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
- * reCaptcha v3:    https://developers.google.com/recaptcha/docs/v3
+ * - Form Validation: https://getbootstrap.com/docs/5.3/forms/validation
+ * - FormData API:    https://developer.mozilla.org/docs/Web/API/FormData
+ * - Fetch API:       https://developer.mozilla.org/docs/Web/API/Fetch_API
+ * - reCAPTCHA v3:    https://developers.google.com/recaptcha/docs/v3
  *
  * Author: Raspgot
  */
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const alertType = result.success ? 'success' : 'danger'; // Set alert class based on status
 
                         // Show alert with response message
-                        alertContainer.className = 'alert alert-' + alertType;
+                        alertContainer.className = 'alert alert-' + alertType + ' fade show';
                         alertContainer.textContent = message;
                         alertContainer.classList.remove('d-none');
                         alertContainer.scrollIntoView({ behavior: 'smooth' });
