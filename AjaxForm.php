@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Secure Contact Form using PHPMailer & reCAPTCHA v3
+ * Secure Contact Form using PHPMailer & reCAPTCHA v3 with autoreply
  * Includes honeypot protection and enhanced email formatting
  *
  * @see      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
  * @package  PHPMailer
- * @version  1.6.1
+ * @version  1.6.2
  */
 
 declare(strict_types=1);
@@ -24,15 +24,16 @@ require_once 'PHPMailer/SMTP.php';
 require_once 'PHPMailer/Exception.php';
 
 // 🛠️ Configuration constants for SMTP and reCAPTCHA
-const SECRET_KEY     = '';                       // Google reCAPTCHA secret key
-const SMTP_HOST      = '';                       // SMTP server hostname
-const SMTP_USERNAME  = '';                       // SMTP username
-const SMTP_PASSWORD  = '';                       // SMTP password
-const SMTP_SECURE    = 'tls';                    // Encryption method: TLS or SSL
-const SMTP_PORT      = 587;                      // Port for TLS (587) or SSL (465)
-const SMTP_AUTH      = true;                     // Enable SMTP authentication
-const FROM_NAME      = 'Raspgot';                // Sender name
-const EMAIL_SUBJECT  = '[Github] New message !'; // Subject for outgoing emails
+const SECRET_KEY              = '';                                               // Google reCAPTCHA secret key
+const SMTP_HOST               = '';                                               // SMTP server hostname
+const SMTP_USERNAME           = '';                                               // SMTP username
+const SMTP_PASSWORD           = '';                                               // SMTP password
+const SMTP_SECURE             = 'tls';                                            // Encryption method: TLS or SSL
+const SMTP_PORT               = 587;                                              // Port for TLS (587) or SSL (465)
+const SMTP_AUTH               = true;                                             // Enable SMTP authentication
+const FROM_NAME               = 'Raspgot';                                        // Sender name
+const EMAIL_SUBJECT           = '[Github] New message !';                         // Subject for outgoing emails
+const EMAIL_SUBJECT_AUTOREPLY = 'Acknowledgment - We have received your message'; // Subject for outgoing auto-reply emails
 
 // Predefined response messages
 const RESPONSES = [
@@ -113,8 +114,8 @@ try {
     // Set sender and recipient
     $mail->setFrom(SMTP_USERNAME, FROM_NAME);
     $mail->Sender = SMTP_USERNAME;
-    $mail->addAddress($email, $name);
-    $mail->addCC(SMTP_USERNAME, 'Admin');
+
+    $mail->addAddress(SMTP_USERNAME, 'Admin');
     $mail->addReplyTo($email, $name);
 
     // Email content
@@ -126,6 +127,30 @@ try {
 
     // Attempt to send email
     $mail->send();
+
+    // Send auto-reply
+    $autoReply = new PHPMailer(true);
+    $autoReply->isSMTP();
+    $autoReply->Host       = SMTP_HOST;
+    $autoReply->SMTPAuth   = SMTP_AUTH;
+    $autoReply->Username   = SMTP_USERNAME;
+    $autoReply->Password   = SMTP_PASSWORD;
+    $autoReply->SMTPSecure = SMTP_SECURE;
+    $autoReply->Port       = SMTP_PORT;
+
+    $autoReply->setFrom(SMTP_USERNAME, FROM_NAME);
+    $autoReply->addAddress($email, $name);
+    $autoReply->Subject = EMAIL_SUBJECT_AUTOREPLY;
+    $autoReply->isHTML(true);
+    $autoReply->CharSet = 'UTF-8';
+    $autoReply->Body = '
+        <p>Hello ' . htmlspecialchars($name) . ',</p>
+        <p>Thank you for your message. Here is a copy of what you sent:</p>
+        <hr>
+    ' . $email_body;
+    $autoReply->AltBody = strip_tags($email_body);
+    $autoReply->send();
+
     respond(true, RESPONSES['success']);
 } catch (Exception $e) {
     // Catch errors and return the message

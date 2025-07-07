@@ -1,6 +1,6 @@
 # Contact-Form-PHP
 
-[![version](https://img.shields.io/badge/version-1.6.0-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
+[![version](https://img.shields.io/badge/version-1.6.2-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
 [![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP)
 [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
@@ -24,6 +24,7 @@ Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reC
 -   **AJAX Form Submission** – Seamless UX, no page reload
 -   **Google reCAPTCHA v3** – Invisible and effective spam protection
 -   **SMTP Email via PHPMailer** – Secure, authenticated delivery
+-   **Automatic User Acknowledgment Email** – Sends a copy of the message to the sender
 -   **User-Agent & Honeypot Spam Filtering** – No bots allowed
 -   **Client + Server Validation** – Double-layered security
 -   **Fully Customizable** – Easily adapt fields, messages, and style
