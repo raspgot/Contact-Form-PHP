@@ -2,16 +2,29 @@
 
 /**
  * Secure Contact Form using PHPMailer & reCAPTCHA v3 with autoreply
- * Includes honeypot protection and enhanced email formatting
  *
- * @see      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
- * @package  PHPMailer
- * @version  1.6.2
+ * Secure AJAX contact form using PHPMailer and reCAPTCHA v3 with autoreply, validating and sanitizing input, verifying tokens, checking email domains, sending SMTP notifications and acknowledgments, detecting honeypots, and enforcing rate limits.
+ *
+ * @author    Raspgot <contact@raspgot.fr>
+ * @link      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
+ * @license   MIT
+ * @version   1.7.0
+ * @package   PHPMailer
+ * @category  Forms
+ * @see       https://github.com/PHPMailer/PHPMailer
+ * @see       https://developers.google.com/recaptcha/docs/v3
+ * @todo      Add logging to a file
+ * @todo      Implement IP blacklist
  */
 
 declare(strict_types=1);
 
-// Set the HTTP response content type to JSON
+// Start session for rate-limiting
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// JSON response header
 header('Content-Type: application/json');
 
 // Import PHPMailer classes
@@ -23,30 +36,32 @@ require_once 'PHPMailer/PHPMailer.php';
 require_once 'PHPMailer/SMTP.php';
 require_once 'PHPMailer/Exception.php';
 
-// 🛠️ Configuration constants for SMTP and reCAPTCHA
-const SECRET_KEY              = '';                                               // Google reCAPTCHA secret key
-const SMTP_HOST               = '';                                               // SMTP server hostname
-const SMTP_USERNAME           = '';                                               // SMTP username
-const SMTP_PASSWORD           = '';                                               // SMTP password
-const SMTP_SECURE             = 'tls';                                            // Encryption method: TLS or SSL
-const SMTP_PORT               = 587;                                              // Port for TLS (587) or SSL (465)
-const SMTP_AUTH               = true;                                             // Enable SMTP authentication
-const FROM_NAME               = 'Raspgot';                                        // Sender name
-const EMAIL_SUBJECT           = '[Github] New message !';                         // Subject for outgoing emails
-const EMAIL_SUBJECT_AUTOREPLY = 'Acknowledgment - We have received your message'; // Subject for outgoing auto-reply emails
+// 🛠️ Configuration constants
+const SECRET_KEY              = '';                              // reCAPTCHA secret
+const SMTP_HOST               = '';                              // SMTP host
+const SMTP_USERNAME           = '';                              // SMTP username
+const SMTP_PASSWORD           = '';                              // SMTP password
+const SMTP_SECURE             = 'tls';                           // Encryption method
+const SMTP_PORT               = 587;                             // SMTP port (TLS)
+const SMTP_AUTH               = true;                            // Enable SMTP auth
+const FROM_NAME               = 'Raspgot';                       // Sender name
+const EMAIL_SUBJECT           = '[GitHub] New message received'; // Email subject
+const EMAIL_SUBJECT_AUTOREPLY = 'We have received your message'; // Auto-reply subject
 
-// Predefined response messages
+/**
+ * Predefined user messages
+ */
 const RESPONSES = [
     'success'          => '✉️ Your message has been sent !',
     'enter_name'       => '⚠️ Please enter your name.',
     'enter_email'      => '⚠️ Please enter a valid email.',
     'enter_message'    => '⚠️ Please enter your message.',
-    'token_error'      => '⚠️ No reCAPTCHA token received.',
-    'domain_error'     => '⚠️ The email domain is invalid.',
+    'token_error'      => '⚠️ reCAPTCHA token is missing.',
+    'domain_error'     => '⚠️ Invalid email domain.',
     'method_error'     => '⚠️ Method not allowed.',
-    'constant_error'   => '⚠️ Missing configuration constants.',
+    'constant_error'   => '⚠️ Configuration is incomplete.',
     'honeypot_error'   => '🚫 Spam detected.',
-    'limit_rate_error' => '🚫 Too many messages sent. Please wait before trying again.',
+    'limit_rate_error' => '🚫 Too many messages sent. Please try again later.',
 ];
 
 // Ensure all necessary constants are set
@@ -54,111 +69,82 @@ if (empty(SECRET_KEY) || empty(SMTP_HOST) || empty(SMTP_USERNAME) || empty(SMTP_
     respond(false, RESPONSES['constant_error']);
 }
 
-// Allow only POST requests (reject GET or others)
+// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(false, RESPONSES['method_error']);
 }
 
-// Simple bot detection based on the user-agent string
-if (empty($_SERVER['HTTP_USER_AGENT']) || preg_match('/\b(curl|wget|httpie|python-requests|httpclient|bot|spider|crawler|scrapy)\b/i', $_SERVER['HTTP_USER_AGENT'])) {
+// Basic bot detection
+$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+if ($userAgent === '' || preg_match('/\b(curl|wget|bot|crawler|spider)\b/i', $userAgent)) {
     respond(false, RESPONSES['honeypot_error']);
 }
 
-// Session rate-limiting: max 3 submissions per hour
+// Rate limit: max 3 per hour (3600s)
 checkSessionRateLimit(3, 3600);
 
-// Gather and validate user input from POST data
+// Input validation
 $date     = new DateTime();
 $ip       = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
 $email    = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL) ?: respond(false, RESPONSES['enter_email']);
 $name     = isset($_POST['name']) ? sanitize($_POST['name']) : respond(false, RESPONSES['enter_name']);
 $message  = isset($_POST['message']) ? sanitize($_POST['message']) : respond(false, RESPONSES['enter_message']);
 $token    = isset($_POST['recaptcha_token']) ? sanitize($_POST['recaptcha_token']) : respond(false, RESPONSES['token_error']);
-$honeypot = isset($_POST['website']) ? trim($_POST['website']) : '';
-if (!empty($honeypot)) {
+$honeypot = trim($_POST['website'] ?? '');
+
+if ($honeypot !== '') {
     respond(false, RESPONSES['honeypot_error']);
 }
 
-// Check if the email domain is valid (DNS records)
+// Validate email domain
 $domain = substr(strrchr($email, "@"), 1);
-if (!checkdnsrr($domain, "MX") && !checkdnsrr($domain, "A")) {
+if (!$domain || (!checkdnsrr($domain, 'MX') && !checkdnsrr($domain, 'A'))) {
     respond(false, RESPONSES['domain_error']);
 }
 
-// Validate the reCAPTCHA token with Google
+// Validate reCAPTCHA (Google)
 validateRecaptcha($token);
 
-// Construct the HTML email content
-$email_body = render_email([
+// Prepare email content
+$emailBody = renderEmail([
     'subject' => EMAIL_SUBJECT,
-    'date'    => $date->format('m/d/Y H:i:s'),
+    'date'    => $date->format('Y-m-d H:i:s'),
     'name'    => $name,
     'email'   => $email,
     'message' => nl2br($message),
     'ip'      => $ip,
 ]);
 
-// Send the email using PHPMailer
-$mail = new PHPMailer(true);
-
 try {
-    // SMTP configuration
-    $mail->isSMTP();
-    $mail->Host       = SMTP_HOST;
-    $mail->SMTPAuth   = SMTP_AUTH;
-    $mail->Username   = SMTP_USERNAME;
-    $mail->Password   = SMTP_PASSWORD;
-    $mail->SMTPSecure = SMTP_SECURE;
-    $mail->Port       = SMTP_PORT;
-
-    // Set sender and recipient
-    $mail->setFrom(SMTP_USERNAME, FROM_NAME);
-    $mail->Sender = SMTP_USERNAME;
-
+    // Send main email
+    $mail = new PHPMailer(true);
+    configureMailer($mail);
     $mail->addAddress(SMTP_USERNAME, 'Admin');
     $mail->addReplyTo($email, $name);
-
-    // Email content
-    $mail->isHTML(true);
-    $mail->CharSet = 'UTF-8';
     $mail->Subject = EMAIL_SUBJECT;
-    $mail->Body    = $email_body;
-    $mail->AltBody = strip_tags($email_body);
-
-    // Attempt to send email
+    $mail->Body    = $emailBody;
+    $mail->AltBody = strip_tags($emailBody);
     $mail->send();
 
     // Send auto-reply
     $autoReply = new PHPMailer(true);
-    $autoReply->isSMTP();
-    $autoReply->Host       = SMTP_HOST;
-    $autoReply->SMTPAuth   = SMTP_AUTH;
-    $autoReply->Username   = SMTP_USERNAME;
-    $autoReply->Password   = SMTP_PASSWORD;
-    $autoReply->SMTPSecure = SMTP_SECURE;
-    $autoReply->Port       = SMTP_PORT;
-
-    $autoReply->setFrom(SMTP_USERNAME, FROM_NAME);
+    configureMailer($autoReply);
     $autoReply->addAddress($email, $name);
     $autoReply->Subject = EMAIL_SUBJECT_AUTOREPLY;
-    $autoReply->isHTML(true);
-    $autoReply->CharSet = 'UTF-8';
     $autoReply->Body = '
         <p>Hello ' . htmlspecialchars($name) . ',</p>
-        <p>Thank you for your message. Here is a copy of what you sent:</p>
-        <hr>
-    ' . $email_body;
-    $autoReply->AltBody = strip_tags($email_body);
+        <p>Thank you for reaching out. Here is a copy of your message:</p>
+        <hr>' . $emailBody;
+    $autoReply->AltBody = strip_tags($emailBody);
     $autoReply->send();
 
     respond(true, RESPONSES['success']);
 } catch (Exception $e) {
-    // Catch errors and return the message
-    respond(false, '❌ ' . $e->getMessage());
+    respond(false, '❌ Mail error: ' . $e->getMessage());
 }
 
 /**
- * Validate the reCAPTCHA token via Google's API
+ * Validates reCAPTCHA token against Google
  *
  * @param string $token reCAPTCHA token received from frontend
  */
@@ -166,41 +152,40 @@ function validateRecaptcha(string $token): void
 {
     $ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
     curl_setopt_array($ch, [
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => http_build_query([
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => http_build_query([
             'secret'   => SECRET_KEY,
-            'response' => $token
+            'response' => $token,
         ]),
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 10,
     ]);
 
-    $response   = curl_exec($ch);
-    $http_code  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curl_error = curl_error($ch);
+    $response  = curl_exec($ch);
+    $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
     curl_close($ch);
 
-    if ($response === false || $http_code !== 200) {
-        respond(false, '❌ Error during the Google reCAPTCHA request : ' . ($curl_error ?: "HTTP $http_code"));
+    if ($response === false || $httpCode !== 200) {
+        respond(false, '❌ reCAPTCHA request failed : ' . ($curlError ?: "HTTP $httpCode"));
     }
 
     $data = json_decode($response, true);
-
     if (empty($data['success'])) {
-        respond(false, '❌ reCAPTCHA validation failed : ', $data['error-codes'] ?? []);
+        respond(false, '❌ reCAPTCHA failed : ', $data['error-codes'] ?? []);
     }
 
     // Reject if score is too low (likely a bot)
-    if (isset($data['score']) && $data['score'] < 0.5) {
-        respond(false, '❌ reCAPTCHA score too low. You might be a robot 🤖');
+    if (($data['score'] ?? 1) < 0.5) {
+        respond(false, '❌ Low reCAPTCHA score. You might be a robot.');
     }
 }
 
 /**
- * Sanitize input to prevent header injection, XSS, and control characters
+ * Sanitize input to prevent header injection and XSS
  *
- * @param string $data Raw input string
- * @return string Sanitized and safe string
+ * @param string $data
+ * @return string
  */
 function sanitize(string $data): string
 {
@@ -212,11 +197,12 @@ function sanitize(string $data): string
 }
 
 /**
- * Send a JSON response and stop script execution
+ * Send a JSON response and stops execution
  *
- * @param bool   $success Success status
- * @param string $message Message to send
- * @param mixed  $detail  Optional additional data
+ * @param bool   $success
+ * @param string $message
+ * @param mixed  $detail
+ * @return void
  */
 function respond(bool $success, string $message, mixed $detail = null): void
 {
@@ -229,55 +215,68 @@ function respond(bool $success, string $message, mixed $detail = null): void
 }
 
 /**
- * Generates the HTML email content using a PHP template and provided data.
+ * Renders the email HTML using a template
  *
- * @param array $data Array containing the required variables for the template
- * @return string The complete rendered HTML content
+ * @param array $data
+ * @return string
  */
-function render_email(array $data): string
+function renderEmail(array $data): string
 {
     // Path to the email template (adjustable if needed)
-    $templateFile = __DIR__ . '/email_template.php';
-
-    if (!is_file($templateFile)) {
-        throw new RuntimeException("Template file not found: $templateFile");
+    $template = __DIR__ . '/email_template.php';
+    if (!is_file($template)) {
+        throw new RuntimeException("Email template not found: $template");
     }
 
     // Encapsulate in a local scope to avoid variable pollution
-    return (function () use ($data, $templateFile): string {
+    return (function () use ($data, $template): string {
         extract($data, EXTR_SKIP); // convert array keys into local variables
         ob_start();
-        require $templateFile;
+        require $template;
         return ob_get_clean();
     })();
 }
 
 /**
- * Limits the number of form submissions per session.
+ * Configures a PHPMailer instance
  *
- * @param int $maxRequests Maximum allowed submissions
- * @param int $period Time window in seconds (e.g., 3600 = 1 hour)
+ * @param PHPMailer $mailer
+ * @return void
  */
-function checkSessionRateLimit(int $maxRequests = 3, int $period = 3600): void
+function configureMailer(PHPMailer $mailer): void
+{
+    $mailer->isSMTP();
+    $mailer->Host       = SMTP_HOST;
+    $mailer->SMTPAuth   = SMTP_AUTH;
+    $mailer->Username   = SMTP_USERNAME;
+    $mailer->Password   = SMTP_PASSWORD;
+    $mailer->SMTPSecure = SMTP_SECURE;
+    $mailer->Port       = SMTP_PORT;
+    $mailer->setFrom(SMTP_USERNAME, FROM_NAME);
+    $mailer->Sender     = SMTP_USERNAME;
+    $mailer->isHTML(true);
+    $mailer->CharSet    = 'UTF-8';
+}
+
+/**
+ * Enforces rate-limiting per session
+ *
+ * @param int $max
+ * @param int $window
+ * @return void
+ */
+function checkSessionRateLimit(int $max = 3, int $window = 3600): void
 {
     $now = time();
-
-    // Initialize the session array if it doesn't exist yet
-    if (!isset($_SESSION['rate_limit_times'])) {
-        $_SESSION['rate_limit_times'] = [];
-    }
-
-    // Remove timestamps that are older than the allowed period
+    $_SESSION['rate_limit_times'] ??= [];
     $_SESSION['rate_limit_times'] = array_filter(
         $_SESSION['rate_limit_times'],
-        fn($timestamp) => $timestamp >= ($now - $period)
+        fn($timestamp) => $timestamp >= ($now - $window)
     );
 
-    // Check if the number of submissions exceeds the limit
-    if (count($_SESSION['rate_limit_times']) >= $maxRequests) {
+    if (count($_SESSION['rate_limit_times']) >= $max) {
         respond(false, RESPONSES['limit_rate_error']);
     }
 
-    // Record the current submission time
     $_SESSION['rate_limit_times'][] = $now;
 }

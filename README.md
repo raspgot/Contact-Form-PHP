@@ -1,49 +1,42 @@
 # Contact-Form-PHP
 
-[![version](https://img.shields.io/badge/version-1.6.2-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
+[![version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
 [![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP)
 [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
 
-A **modern**, **lightweight**, and **secure** contact form for any PHP project.  
-Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3** — no jQuery, no bloat.  
+A **modern**, **secure**, and **customizable** contact form for any PHP project.
+Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3** — no jQuery, no bloat.
 🔐 Designed for performance, accessibility, and clean code.
 
 ![Demo](https://github.raspgot.fr/contact-form-raspgot.gif)
-
-## 🚀 Live Demo
-
-🔗 [Try the live demo](https://github.raspgot.fr)
 
 ---
 
 ## ✨ Features
 
--   **PHP 8.4+ Ready** – Future-proof and modern codebase
--   **Responsive Bootstrap 5 UI** – Clean, accessible and mobile-friendly
--   **AJAX Form Submission** – Seamless UX, no page reload
--   **Google reCAPTCHA v3** – Invisible and effective spam protection
--   **SMTP Email via PHPMailer** – Secure, authenticated delivery
--   **Automatic User Acknowledgment Email** – Sends a copy of the message to the sender
--   **User-Agent & Honeypot Spam Filtering** – No bots allowed
--   **Client + Server Validation** – Double-layered security
--   **Fully Customizable** – Easily adapt fields, messages, and style
+-   **PHP 8+ Ready** – Strictly typed and future-proof
+-   **Bootstrap 5 UI** – Responsive and accessible
+-   **AJAX Submission** – No page reloads
+-   **Google reCAPTCHA v3** – Invisible spam protection
+-   **SMTP Delivery with PHPMailer** – Secure emails
+-   **Auto-reply to users** – Confirm receipt
+-   **Disposable email detection** – Block throwaway addresses
+-   **Honeypot spam traps** – Catch bots
+-   **Session-based rate limiting** – Prevent abuse
+-   **Easy customization** – Tailor fields and styles
 
 ---
 
-### Want even better spam protection ?
+## 🚀 Live Demo
 
-✅ Regex-enhanced bot detection  
-✅ DNS email domain validation  
-✅ Honeypot field  
-✅ reCAPTCHA score filtering  
-✅ rate limiting using sessions (3 submissions per hour)
+🔗 [View the demo](https://github.raspgot.fr)
 
 ---
 
 ## 📦 Quick Start
 
-### 1. Clone the repository
+1. Clone the repository :
 
 ```bash
 git clone https://github.com/raspgot/Contact-Form-PHP.git
@@ -51,7 +44,7 @@ git clone https://github.com/raspgot/Contact-Form-PHP.git
 
 Or [download as ZIP](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip).
 
-### 2. Run it locally
+2. Run it locally :
 
 Use a local PHP server like [XAMPP](https://www.apachefriends.org), [MAMP](https://www.mamp.info) or PHP's built-in server:
 
@@ -63,34 +56,36 @@ php -S localhost:8000
 
 ## ⚙️ Configuration
 
-### 1. Set your credentials
+### 1. Set credentials
 
-Get your reCAPTCHA secret key from [Google reCAPTCHA Admin Panel](https://www.google.com/recaptcha/admin)
+Get your reCAPTCHA secret key at [Google reCAPTCHA](https://www.google.com/recaptcha/admin).
 
-Edit the following constants in `AjaxForm.php`:
+In `AjaxForm.php`, edit:
 
 ```php
-const SMTP_HOST     = 'your.smtp.com';
-const SMTP_USERNAME = 'your@email.com';
-const SMTP_PASSWORD = 'yourpassword';
 const SECRET_KEY    = 'your_recaptcha_secret_key';
+const SMTP_HOST     = 'smtp.yourprovider.com';
+const SMTP_USERNAME = 'you@example.com';
+const SMTP_PASSWORD = 'yourpassword';
+const SMTP_SECURE   = 'tls'; // 'tls' (recommended) or 'ssl'
+const SMTP_PORT     = 587;
 ```
 
-> ℹ️ Enable the `php_curl` extension in your `php.ini` file:
+> **Note:** Enable `php_curl` in `php.ini`:
 >
 > ```ini
 > extension=curl
 > ```
 
-### 2. Set your site key in JS
+### 2. Set reCAPTCHA site key in JS
 
-In `AjaxForm.js`, edit the key:
+In `AjaxForm.js`:
 
-```js
+```javascript
 const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
 ```
 
-And add the reCAPTCHA script at the end of `index.html`, before `</body>`:
+And in `index.html`:
 
 ```html
 <script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
@@ -102,50 +97,42 @@ And add the reCAPTCHA script at the end of `index.html`, before `</body>`:
 
 ### ✏️ Change validation messages
 
-Edit them directly in the HTML:
+Edit the messages in `index.html`:
 
 ```html
 <div class="valid-feedback">Looks good !</div>
 <div class="invalid-feedback">Please provide a valid name.</div>
 ```
 
-### ➕ Add new fields
+## ✨ Advanced Features
 
-To add fields (e.g. subject or phone):
-
-**1.** Add the field in `index.html`:
-
-```html
-<input type="text" name="subject" class="form-control" required />
-```
-
-**2.** Handle it in `AjaxForm.php`:
-
-```php
-$subject = sanitize($_POST['subject']) ?? '';
-```
-
-**3.** Include it in `email_template.php`:
+-   Regex-based User-Agent detection (blocks common bots)
+-   DNS and disposable email validation (rejects throwaway emails)
+-   reCAPTCHA score filtering (requires min. score 0.5)
+-   Honeypot hidden field (traps bots)
+-   Session rate limiting (max 3 submissions per hour)
+-   Input sanitization to prevent header injection and XSS
+-   Automatic user acknowledgment email
+-   Customizable email template with dynamic data
 
 ---
 
 ## 🙌 Contributing
 
-Found a bug ? Have a suggestion ? Pull requests and feedback are welcome !
+Feel free to open issues or submit pull requests :)
 
 ---
 
-## Author
+## 🧑‍💻 Author
 
 ![Logo](https://github.raspgot.fr/raspgot-blue.png)
+Developed by [**Raspgot**](https://raspgot.fr) — [contact@raspgot.fr](mailto:contact@raspgot.fr)
 
-Developed with ❤️ by [**Raspgot**](https://raspgot.fr)
-
-If you find this project helpful, don't forget to ⭐ star the repo !
+If you find this project useful, please ⭐ star the repository !
 
 ---
 
-## Dependencies
+## 📚 Dependencies
 
 -   [PHPMailer](https://github.com/PHPMailer/PHPMailer)
 -   [Bootstrap](https://github.com/twbs/bootstrap)
