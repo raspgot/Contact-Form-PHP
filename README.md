@@ -6,7 +6,7 @@
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
 
 A **modern**, **secure**, and **customizable** contact form for any PHP project.
-Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3** — no jQuery, no bloat.
+Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3** — no jQuery, no bloat.  
 🔐 Designed for performance, accessibility, and clean code.
 
 ![Demo](https://github.raspgot.fr/contact-form-raspgot.gif)
@@ -125,7 +125,7 @@ Feel free to open issues or submit pull requests :)
 
 ## 🧑‍💻 Author
 
-![Logo](https://github.raspgot.fr/raspgot-blue.png)
+![Logo](https://github.raspgot.fr/raspgot-blue.png)  
 Developed by [**Raspgot**](https://raspgot.fr) — [contact@raspgot.fr](mailto:contact@raspgot.fr)
 
 If you find this project useful, please ⭐ star the repository !
