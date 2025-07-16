@@ -1,6 +1,6 @@
 # Contact-Form-PHP
 
-[![version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
+[![version](https://img.shields.io/badge/version-1.7.1-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
 [![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP)
 [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
@@ -137,7 +137,7 @@ Feel free to open issues or submit pull requests :)
 
 ## 🧑‍💻 Author
 
-![Logo](https://github.raspgot.fr/raspgot-blue.png)
+![Logo](https://github.raspgot.fr/raspgot-blue.png)  
 Developed by [**Raspgot**](https://raspgot.fr) — [contact@raspgot.fr](mailto:contact@raspgot.fr)
 
 If you find this project useful, please ⭐ star the repository !
