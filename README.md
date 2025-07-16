@@ -5,13 +5,11 @@
 [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
 
-A **modern**, **secure**, and **customizable** contact form for any PHP project.
-Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3** — no jQuery, no bloat.  
-🔐 Designed for performance, accessibility, and clean code.
+A **modern**, **secure**, and **customizable** contact form for any PHP project
+Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3** — no jQuery, no bloat  
+🔐 Designed for performance, accessibility, and clean code
 
 ![Demo](https://github.raspgot.fr/contact-form-raspgot.gif)
-
----
 
 ## ✨ Features
 
@@ -26,13 +24,9 @@ Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reC
 -   **Session-based rate limiting** – Prevent abuse
 -   **Easy customization** – Tailor fields and styles
 
----
-
 ## 🚀 Live Demo
 
 🔗 [View the demo](https://github.raspgot.fr)
-
----
 
 ## 📦 Quick Start
 
@@ -42,23 +36,21 @@ Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reC
 git clone https://github.com/raspgot/Contact-Form-PHP.git
 ```
 
-Or [download as ZIP](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip).
+Or [download as ZIP](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip)
 
 2. Run it locally :
 
-Use a local PHP server like [XAMPP](https://www.apachefriends.org), [MAMP](https://www.mamp.info) or PHP's built-in server:
+Use a local PHP server like [XAMPP](https://www.apachefriends.org), [MAMP](https://www.mamp.info) or PHP's built-in server :
 
 ```bash
 php -S localhost:8000
 ```
 
----
-
 ## ⚙️ Configuration
 
 ### 1. Set credentials
 
-Get your reCAPTCHA secret key at [Google reCAPTCHA](https://www.google.com/recaptcha/admin).
+Get your reCAPTCHA secret key at [Google reCAPTCHA](https://www.google.com/recaptcha/admin)
 
 In `AjaxForm.php`, edit:
 
@@ -67,7 +59,7 @@ const SECRET_KEY    = 'your_recaptcha_secret_key';
 const SMTP_HOST     = 'smtp.yourprovider.com';
 const SMTP_USERNAME = 'you@example.com';
 const SMTP_PASSWORD = 'yourpassword';
-const SMTP_SECURE   = 'tls'; // 'tls' (recommended) or 'ssl'
+const SMTP_SECURE   = 'tls';
 const SMTP_PORT     = 587;
 ```
 
@@ -91,7 +83,16 @@ And in `index.html`:
 <script src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
 ```
 
----
+## ✨ Advanced Features
+
+-   Regex-based User-Agent detection (blocks common bots)
+-   DNS and disposable email validation (rejects throwaway emails)
+-   reCAPTCHA score filtering (requires min. score 0.5)
+-   Honeypot hidden field (traps bots)
+-   Session rate limiting (max 3 submissions per hour)
+-   Input sanitization to prevent header injection and XSS
+-   Automatic user acknowledgment email
+-   Customizable email template with dynamic data
 
 ## 🛠️ Customization
 
@@ -104,33 +105,42 @@ Edit the messages in `index.html`:
 <div class="invalid-feedback">Please provide a valid name.</div>
 ```
 
-## ✨ Advanced Features
+### ✉️ Customize the confirmation email
 
--   Regex-based User-Agent detection (blocks common bots)
--   DNS and disposable email validation (rejects throwaway emails)
--   reCAPTCHA score filtering (requires min. score 0.5)
--   Honeypot hidden field (traps bots)
--   Session rate limiting (max 3 submissions per hour)
--   Input sanitization to prevent header injection and XSS
--   Automatic user acknowledgment email
--   Customizable email template with dynamic data
+The file `email_template.php` contains the HTML template for the confirmation email automatically sent to the user after form submission
 
----
+You can modify this file to:
+
+-   Change the content of the email
+-   Add your logo and branding
+-   Adjust formatting and styles
+
+### ⚡ Adjust session rate limiting
+
+By default, the form limits users to **5 submissions per hour** to prevent abuse
+
+To change this limit:
+
+1. Open `AjaxForm.php`
+2. Look for the following lines:
+
+```php
+const MAX_ATTEMPTS = 5;
+const RATE_LIMIT_DURATION = 3600; // seconds (3600 = 1 hour)
+```
+
+3. Modify `MAX_ATTEMPTS` and `RATE_LIMIT_DURATION` to suit your needs
 
 ## 🙌 Contributing
 
 Feel free to open issues or submit pull requests :)
 
----
-
 ## 🧑‍💻 Author
 
-![Logo](https://github.raspgot.fr/raspgot-blue.png)  
+![Logo](https://github.raspgot.fr/raspgot-blue.png)
 Developed by [**Raspgot**](https://raspgot.fr) — [contact@raspgot.fr](mailto:contact@raspgot.fr)
 
 If you find this project useful, please ⭐ star the repository !
-
----
 
 ## 📚 Dependencies
 
