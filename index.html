@@ -20,7 +20,7 @@
             </header>
 
             <section class="shadow rounded p-5 bg-light">
-                <!-- Alert box to display status messages -->
+                <!-- Alert box for status messages -->
                 <div id="alert-status" class="alert d-none" role="alert" aria-live="polite"></div>
 
                 <!-- Contact Form -->
@@ -35,11 +35,19 @@
 
                     <!-- Email Field -->
                     <div class="mb-3">
-                        <label for="email" class="form-label fs-5">E-mail</label>
+                        <label for="email" class="form-label fs-5">Email</label>
                         <input type="email" class="form-control" id="email" name="email" required autocomplete="email" />
                         <div class="form-text">Make sure to provide a valid email address.</div>
                         <div class="valid-feedback">Looks good !</div>
                         <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
+
+                    <!-- Subject Field -->
+                    <div class="mb-3">
+                        <label for="subject" class="form-label fs-5">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required autocomplete="off" />
+                        <div class="valid-feedback">Looks good !</div>
+                        <div class="invalid-feedback">Please enter a subject.</div>
                     </div>
 
                     <!-- Message Field -->
@@ -50,25 +58,24 @@
                         <div class="invalid-feedback">Please enter your message.</div>
                     </div>
 
-                    <!-- Honeypot Field to trap spam bots (hidden to users) -->
+                    <!-- Honeypot Field (hidden to humans) -->
                     <div class="d-none">
                         <label for="website">Website</label>
-                        <input type="text" name="website" tabindex="-1" autocomplete="off" />
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="btn btn-primary px-5">
-                        <span id="loading-spinner" class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                    <button type="submit" class="btn btn-primary px-4 btn-lg d-flex align-items-center justify-content-center gap-2">
+                        <span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                         <span>Submit</span>
                     </button>
                 </form>
             </section>
         </main>
 
-        <!-- External Scripts -->
         <!-- reCAPTCHA v3 (replace with your site key) -->
         <script defer src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
-        <!-- Bootstrap Bundle with Popper -->
+        <!-- Bootstrap Bundle -->
         <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Custom JS handling AJAX form submission -->
         <script src="AjaxForm.js"></script>
