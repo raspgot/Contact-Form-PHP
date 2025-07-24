@@ -14,9 +14,7 @@
  * @author    Raspgot <contact@raspgot.fr>
  * @link      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
  * @license   MIT
- * @version   1.7.1
- * @package   PHPMailer
- * @category  Forms
+ * @version   1.7.2
  * @see       https://github.com/PHPMailer/PHPMailer
  * @see       https://developers.google.com/recaptcha/docs/v3
  */
@@ -51,7 +49,7 @@ const SMTP_AUTH               = true;                             // Whether SMT
 const FROM_NAME               = 'Raspgot';                        // Name displayed as sender
 const EMAIL_SUBJECT_DEFAULT   = '[GitHub] New message received';  // Default subject if none provided
 const EMAIL_SUBJECT_AUTOREPLY = 'We have received your message';  // Subject of auto-reply email
-const MAX_ATTEMPTS            = 5;                                // Maximum allowed submissions per session
+const MAX_ATTEMPTS            = 55;                                // Maximum allowed submissions per session
 const RATE_LIMIT_DURATION     = 3600;                             // 30 minutes
 
 // User-facing response messages
@@ -91,7 +89,7 @@ checkSessionRateLimit(MAX_ATTEMPTS, RATE_LIMIT_DURATION);
 // Input collection and validation
 $date     = new DateTime();
 $ip       = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
-$email    = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL) ?: respond(false, RESPONSES['enter_email']);
+$email    = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL) ?: respond(false, RESPONSES['enter_email'], 'email');
 $name     = isset($_POST['name']) ? sanitize($_POST['name']) : respond(false, RESPONSES['enter_name']);
 $message  = isset($_POST['message']) ? sanitize($_POST['message']) : respond(false, RESPONSES['enter_message']);
 $subject  = isset($_POST['subject']) ? sanitize($_POST['subject']) : respond(false, RESPONSES['enter_subject']);
@@ -106,7 +104,7 @@ if ($honeypot !== '') {
 // Check if email domain has valid DNS records
 $domain = substr(strrchr($email, "@"), 1);
 if (!$domain || (!checkdnsrr($domain, 'MX') && !checkdnsrr($domain, 'A'))) {
-    respond(false, RESPONSES['domain_error']);
+    respond(false, RESPONSES['domain_error'], 'email');
 }
 
 // Validate reCAPTCHA score and authenticity
@@ -147,7 +145,7 @@ try {
 
     respond(true, RESPONSES['success']);
 } catch (Exception $e) {
-    respond(false, '❌ Mail error: ' . $e->getMessage());
+    respond(false, '❌ Mail error: ' . $e->getMessage(), 'email');
 }
 
 /**
@@ -223,18 +221,20 @@ function sanitize(string $data): string
 }
 
 /**
- * Sends a JSON response and exits
+ * Sends a JSON response and terminates the script.
  *
- * @param bool   $success Whether the operation succeeded
- * @param string $message Message to display to the user
- * @param mixed  $detail  Optional debug information
+ * @param bool   $success Whether the operation was successful.
+ * @param string $message Message to be displayed to the user.
+ * @param string|null $field Optional field name to mark as invalid.
+ *
+ * @return never This function does not return; it ends execution with exit().
  */
-function respond(bool $success, string $message, mixed $detail = null): void
+function respond(bool $success, string $message, ?string $field = null): never
 {
     echo json_encode([
         'success' => $success,
         'message' => $message,
-        'detail'  => $detail,
+        'field'   => $field,
     ]);
     exit;
 }
