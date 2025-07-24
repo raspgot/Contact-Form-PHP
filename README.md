@@ -30,21 +30,19 @@ Built with **Bootstrap 5**, powered by **AJAX**, **PHPMailer**, and **Google reC
 
 ## 📦 Quick Start
 
-1. Clone the repository :
+1. **Clone the repository:**
 
-```bash
-git clone https://github.com/raspgot/Contact-Form-PHP.git
-```
+    ```bash
+    git clone https://github.com/raspgot/Contact-Form-PHP.git
+    ```
 
-Or [download as ZIP](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip)
+    Or [download as ZIP](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip)
 
-2. Run it locally :
-
-Use a local PHP server like [XAMPP](https://www.apachefriends.org), [MAMP](https://www.mamp.info) or PHP's built-in server :
-
-```bash
-php -S localhost:8000
-```
+2. **Run locally:**
+   Use a local PHP server like [XAMPP](https://www.apachefriends.org), [MAMP](https://www.mamp.info) or PHP's built-in server:
+    ```bash
+    php -S localhost:8000
+    ```
 
 ## ⚙️ Configuration
 
@@ -124,10 +122,10 @@ To change this limit:
 1. Open `AjaxForm.php`
 2. Look for the following lines:
 
-```php
-const MAX_ATTEMPTS = 5;
-const RATE_LIMIT_DURATION = 3600; // seconds (3600 = 1 hour)
-```
+    ```php
+    const MAX_ATTEMPTS = 5;
+    const RATE_LIMIT_DURATION = 3600; // seconds (3600 = 1 hour)
+    ```
 
 3. Modify `MAX_ATTEMPTS` and `RATE_LIMIT_DURATION` to suit your needs
 
