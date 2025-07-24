@@ -1,6 +1,6 @@
 # Contact-Form-PHP
 
-[![version](https://img.shields.io/badge/version-1.7.1-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
+[![version](https://img.shields.io/badge/version-1.7.2-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
 [![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP)
 [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
