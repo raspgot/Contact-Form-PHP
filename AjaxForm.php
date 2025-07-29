@@ -13,7 +13,6 @@
  *
  * @author    Raspgot <contact@raspgot.fr>
  * @link      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
- * @license   MIT
  * @version   1.7.2
  * @see       https://github.com/PHPMailer/PHPMailer
  * @see       https://developers.google.com/recaptcha/docs/v3
