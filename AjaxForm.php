@@ -13,7 +13,7 @@
  *
  * @author    Raspgot <contact@raspgot.fr>
  * @link      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
- * @version   1.7.2
+ * @version   1.7.3
  * @see       https://github.com/PHPMailer/PHPMailer
  * @see       https://developers.google.com/recaptcha/docs/v3
  */
@@ -33,9 +33,9 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 // Load PHPMailer manually (no-Composer project)
-require_once 'PHPMailer/PHPMailer.php';
-require_once 'PHPMailer/SMTP.php';
-require_once 'PHPMailer/Exception.php';
+require_once __DIR__ . '/PHPMailer/PHPMailer.php';
+require_once __DIR__ . '/PHPMailer/SMTP.php';
+require_once __DIR__ . '/PHPMailer/Exception.php';
 
 // Configuration constants (must be customized)
 const SECRET_KEY              = '';                               // Your reCAPTCHA secret key
@@ -48,8 +48,8 @@ const SMTP_AUTH               = true;                             // Whether SMT
 const FROM_NAME               = 'Raspgot';                        // Name displayed as sender
 const EMAIL_SUBJECT_DEFAULT   = '[GitHub] New message received';  // Default subject if none provided
 const EMAIL_SUBJECT_AUTOREPLY = 'We have received your message';  // Subject of auto-reply email
-const MAX_ATTEMPTS            = 55;                                // Maximum allowed submissions per session
-const RATE_LIMIT_DURATION     = 3600;                             // 30 minutes
+const MAX_ATTEMPTS            = 5;                                // Maximum allowed submissions per session
+const RATE_LIMIT_DURATION     = 3600;                             // 1 hour rate limit (in seconds)
 
 // User-facing response messages
 const RESPONSES = [
@@ -127,7 +127,10 @@ try {
     $mail->addReplyTo($email, $name);
     $mail->Subject = $subject ?: EMAIL_SUBJECT_DEFAULT;
     $mail->Body    = $emailBody;
-    $mail->AltBody = strip_tags($emailBody);
+    // First convert <br> tags into \n (strip_tags removes <br> without adding line breaks)
+    $alt = preg_replace('/<br\s*\/?>/i', "\n", $emailBody);
+    $alt = trim(strip_tags($alt));
+    $mail->AltBody = $alt;
     $mail->send();
 
     // Send confirmation auto-reply to user
@@ -137,9 +140,9 @@ try {
     $autoReply->Subject = EMAIL_SUBJECT_AUTOREPLY . ' — ' . $subject;
     $autoReply->Body = '
         <p>Hello ' . htmlspecialchars($name) . ',</p>
-        <p>Thank you for reaching out. Here is a copy of your message:</p>
+        <p>Thank you for reaching out, here is a copy of your message :</p>
         <hr>' . $emailBody;
-    $autoReply->AltBody = strip_tags($emailBody);
+    $autoReply->AltBody = $alt;
     $autoReply->send();
 
     respond(true, RESPONSES['success']);
@@ -148,9 +151,9 @@ try {
 }
 
 /**
- * Verifies reCAPTCHA token with Google API and checks score.
+ * Verifies reCAPTCHA token with Google API and checks score, action & hostname
  *
- * @param string $token reCAPTCHA token submitted by the form.
+ * @param string $token reCAPTCHA token submitted by the form
  * @return void
  */
 function validateRecaptcha(string $token): void
@@ -161,6 +164,7 @@ function validateRecaptcha(string $token): void
     $postFields = http_build_query([
         'secret'   => SECRET_KEY,
         'response' => $token,
+        'remoteip' => $_SERVER['REMOTE_ADDR'] ?? null,
     ]);
 
     curl_setopt_array($ch, [
@@ -170,34 +174,47 @@ function validateRecaptcha(string $token): void
         CURLOPT_TIMEOUT        => 10,
     ]);
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $response  = curl_exec($ch);
+    $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlError = curl_error($ch);
     curl_close($ch);
 
-    // Handle HTTP or cURL error
+    // If cURL execution failed (network error, timeout, etc.)
     if ($response === false) {
         respond(false, '❌ reCAPTCHA request failed : ' . ($curlError ?: 'Unknown cURL error.'));
     }
 
+    // If Google did not respond with a 200 OK
     if ($httpCode !== 200) {
         respond(false, '❌ reCAPTCHA HTTP error : ' . $httpCode);
     }
 
-    // Parse JSON response
     $data = json_decode($response, true);
 
+    // If response cannot be decoded as valid JSON
     if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
         respond(false, '❌ Invalid JSON response from reCAPTCHA.');
     }
 
-    // Check success flag
+    // If Google says "success" flag is false (invalid token, wrong secret, expired, etc.)
     if (empty($data['success'])) {
         $errors = isset($data['error-codes']) ? implode(', ', $data['error-codes']) : 'Unknown error.';
         respond(false, '❌ reCAPTCHA verification failed : ' . $errors);
     }
 
-    // Check score (threshold configurable if needed)
+    // If the "action" does not match the one expected (mitigates token reuse across forms)
+    $expectedAction = 'submit';
+    if (($data['action'] ?? '') !== $expectedAction) {
+        respond(false, '❌ reCAPTCHA action mismatch.');
+    }
+
+    // If the hostname returned by Google does not match our server's hostname (prevents token theft)
+    $expectedHost = $_SERVER['SERVER_NAME'] ?? '';
+    if (!empty($expectedHost) && ($data['hostname'] ?? '') !== $expectedHost) {
+        respond(false, '❌ reCAPTCHA hostname mismatch.');
+    }
+
+    // If the score is below threshold (Google thinks the request looks like a bot)
     $score = $data['score'] ?? 1.0;
     if ($score < 0.6) {
         respond(false, '❌ Low reCAPTCHA score (' . $score . '). You might be a robot.');
@@ -220,13 +237,13 @@ function sanitize(string $data): string
 }
 
 /**
- * Sends a JSON response and terminates the script.
+ * Sends a JSON response and terminates the script
  *
- * @param bool   $success Whether the operation was successful.
- * @param string $message Message to be displayed to the user.
- * @param string|null $field Optional field name to mark as invalid.
+ * @param bool   $success Whether the operation was successful
+ * @param string $message Message to be displayed to the user
+ * @param string|null $field Optional field name to mark as invalid
  *
- * @return never This function does not return; it ends execution with exit().
+ * @return never This function does not return; it ends execution with exit()
  */
 function respond(bool $success, string $message, ?string $field = null): never
 {
