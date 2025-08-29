@@ -10,64 +10,66 @@
     </head>
 
     <body>
-        <main class="container pt-4" style="max-width: 700px">
-            <header class="text-center mb-4">
-                <h1 class="fw-bold mb-2">Contact Us</h1>
-                <p class="text-muted">If you found this project helpful, ⭐️ star the repo !</p>
+        <main class="container-md pt-4">
+            <div class="mx-auto" style="max-width: 700px">
+                <header class="text-center mb-4">
+                    <h1 class="fw-bold mb-2">Contact Us</h1>
+                    <p class="text-muted">If you found this project helpful, ⭐️ star the repo !</p>
 
-                <!-- GitHub Button (optional) -->
-                <a class="github-button" href="https://github.com/raspgot/Contact-Form-PHP" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star raspgot/Contact-Form-PHP on GitHub">Give a star !</a>
-            </header>
+                    <!-- GitHub Button (optional) -->
+                    <a class="github-button" href="https://github.com/raspgot/Contact-Form-PHP" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star raspgot/Contact-Form-PHP on GitHub">Give a star !</a>
+                </header>
 
-            <section class="shadow rounded p-4 bg-white">
-                <!-- Status -->
-                <div id="alert-status" class="alert d-none" role="alert" aria-live="polite"></div>
+                <section class="shadow rounded p-4 bg-body">
+                    <!-- Status -->
+                    <div id="alert-status" class="alert d-none" role="alert" aria-live="polite"></div>
 
-                <!-- Form -->
-                <form method="post" class="needs-validation" novalidate autocomplete="off">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required autocomplete="name" />
-                        <div class="valid-feedback">Looks good !</div>
-                        <div class="invalid-feedback">Please enter your name.</div>
-                    </div>
+                    <!-- Form -->
+                    <form method="post" class="needs-validation" novalidate autocomplete="off">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required autocomplete="name" />
+                            <div class="valid-feedback">Looks good !</div>
+                            <div class="invalid-feedback">Please enter your name.</div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required autocomplete="email" />
-                        <div class="form-text">Make sure to provide a valid email address.</div>
-                        <div class="valid-feedback">Looks good !</div>
-                        <div class="invalid-feedback">Please enter a valid email address.</div>
-                    </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email<span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required autocomplete="email" />
+                            <div class="form-text">We'll use this to send a confirmation.</div>
+                            <div class="valid-feedback">Looks good !</div>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="subject" class="form-label">Subject</label>
-                        <input type="text" class="form-control" id="subject" name="subject" required autocomplete="off" />
-                        <div class="valid-feedback">Looks good !</div>
-                        <div class="invalid-feedback">Please enter a subject.</div>
-                    </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="subject" name="subject" required autocomplete="off" />
+                            <div class="valid-feedback">Looks good !</div>
+                            <div class="invalid-feedback">Please enter a subject.</div>
+                        </div>
 
-                    <div class="mb-4">
-                        <label for="message" class="form-label">Message</label>
-                        <textarea class="form-control" id="message" name="message" rows="6" required autocomplete="off"></textarea>
-                        <div class="form-text">Be as specific as you can.</div>
-                        <div class="valid-feedback">Looks good !</div>
-                        <div class="invalid-feedback">Please enter your message.</div>
-                    </div>
+                        <div class="mb-4">
+                            <label for="message" class="form-label">Message<span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="message" name="message" rows="6" required autocomplete="off"></textarea>
+                            <div class="form-text">Be as specific as you can.</div>
+                            <div class="valid-feedback">Looks good !</div>
+                            <div class="invalid-feedback">Please enter your message.</div>
+                        </div>
 
-                    <!-- Honeypot -->
-                    <div class="d-none">
-                        <label for="website">Website</label>
-                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
-                    </div>
+                        <!-- Honeypot -->
+                        <div class="d-none" aria-hidden="true">
+                            <label for="website">Website</label>
+                            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+                        </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit" class="btn btn-primary w-100 btn-lg d-flex align-items-center justify-content-center gap-2">
-                        <span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        <span>Submit</span>
-                    </button>
-                </form>
-            </section>
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100 btn-lg d-flex align-items-center justify-content-center gap-2">
+                            <span id="loading-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            <span>Submit</span>
+                        </button>
+                    </form>
+                </section>
+            </div>
         </main>
 
         <!-- reCAPTCHA v3 (replace with your site key) -->
