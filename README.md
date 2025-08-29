@@ -99,18 +99,18 @@ extension=curl
 
 ## 🔒 Advanced Features
 
--   Regex-based bot User-Agent blocking
--   DNS & disposable email checks
--   reCAPTCHA score filtering (min. 0.5)
--   Honeypot hidden field
--   Session rate limiting (default: 5/hour)
--   Header injection & XSS protection
+- **Smart bot blocking** – Detects and blocks suspicious User-Agents using regex patterns  
+- **Email validation** – Verifies DNS (MX records) and rejects disposable addresses  
+- **reCAPTCHA v3 scoring** – Filters out low-trust requests (score < 0.5) silently  
+- **Honeypot field** – Invisible trap to catch automated bots without affecting UX  
+- **Rate limiting** – Restricts to 5 submissions per session per hour to prevent abuse  
+- **Input sanitization** – Protects against header injection and XSS attacks
 
 ---
 
 ## 🤝 Contributing
 
-Issues and PRs are welcome! 🚀
+Issues and PRs are welcome !
 
 ---
 
