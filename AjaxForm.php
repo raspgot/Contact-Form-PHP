@@ -3,14 +3,6 @@
 /**
  * Secure Contact Form using PHPMailer & reCAPTCHA v3 with autoreply
  *
- * An advanced, secure AJAX contact form implementation.
- * Features:
- * - Input validation and sanitization
- * - reCAPTCHA v3 verification
- * - Honeypot field detection
- * - Rate limiting per session
- * - SMTP email delivery with auto-reply
- *
  * @author    Raspgot <contact@raspgot.fr>
  * @link      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
  * @version   1.7.3
@@ -20,12 +12,12 @@
 
 declare(strict_types=1);
 
-// Start session to store rate-limit timestamps
+// Start session (required for rate limiting)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Always return JSON responses
+// Always return responses as JSON
 header('Content-Type: application/json');
 
 // Import PHPMailer classes
@@ -37,55 +29,55 @@ require_once __DIR__ . '/PHPMailer/PHPMailer.php';
 require_once __DIR__ . '/PHPMailer/SMTP.php';
 require_once __DIR__ . '/PHPMailer/Exception.php';
 
-// Configuration constants (must be customized)
-const SECRET_KEY              = '';                               // Your reCAPTCHA secret key
+// Configuration constants (⚠️ must be customized before deployment)
+const SECRET_KEY              = '';                               // Google reCAPTCHA secret key
 const SMTP_HOST               = '';                               // SMTP server hostname
-const SMTP_USERNAME           = '';                               // SMTP username (sender address)
-const SMTP_PASSWORD           = '';                               // SMTP password
-const SMTP_SECURE             = 'tls';                            // Encryption protocol: ssl or tls
-const SMTP_PORT               = 587;                              // SMTP server port
-const SMTP_AUTH               = true;                             // Whether SMTP authentication is required
-const FROM_NAME               = 'Raspgot';                        // Name displayed as sender
+const SMTP_USERNAME           = '';                               // SMTP account / sender address
+const SMTP_PASSWORD           = '';                               // SMTP account password
+const SMTP_SECURE             = 'tls';                            // Encryption protocol: "ssl" or "tls"
+const SMTP_PORT               = 587;                              // SMTP server port (e.g. 465 for SSL, 587 for TLS)
+const SMTP_AUTH               = true;                             // Enable/disable SMTP authentication
+const FROM_NAME               = 'Raspgot';                        // Sender display name
 const EMAIL_SUBJECT_DEFAULT   = '[GitHub] New message received';  // Default subject if none provided
-const EMAIL_SUBJECT_AUTOREPLY = 'We have received your message';  // Subject of auto-reply email
-const MAX_ATTEMPTS            = 5;                                // Maximum allowed submissions per session
-const RATE_LIMIT_DURATION     = 3600;                             // 1 hour rate limit (in seconds)
+const EMAIL_SUBJECT_AUTOREPLY = 'We have received your message';  // Subject of user autoreply
+const MAX_ATTEMPTS            = 5;                                // Max form submissions allowed per session
+const RATE_LIMIT_DURATION     = 3600;                             // Rate limit in seconds (1 hour)
 
-// User-facing response messages
+// Predefined user-facing response messages
 const RESPONSES = [
-    'success'          => '✉️ Your message has been sent !',
+    'success'          => '✉️ Your message has been sent!',
     'enter_name'       => '⚠️ Please enter your name.',
-    'enter_email'      => '⚠️ Please enter a valid email.',
+    'enter_email'      => '⚠️ Please enter a valid email address.',
     'enter_message'    => '⚠️ Please enter your message.',
-    'enter_subject'    => '⚠️ Please enter your subject.',
-    'token_error'      => '⚠️ reCAPTCHA token is missing.',
+    'enter_subject'    => '⚠️ Please enter a subject.',
+    'token_error'      => '⚠️ reCAPTCHA token missing.',
     'domain_error'     => '⚠️ Invalid email domain.',
     'method_error'     => '⚠️ Method not allowed.',
-    'constant_error'   => '⚠️ Configuration is incomplete.',
+    'constant_error'   => '⚠️ Missing configuration constants.',
     'honeypot_error'   => '🚫 Spam detected.',
-    'limit_rate_error' => '🚫 Too many messages sent. Try again later.',
+    'limit_rate_error' => '🚫 Too many messages sent. Please try again later.',
 ];
 
-// Verify that all configuration constants are set
+// Ensure configuration is properly set
 if (empty(SECRET_KEY) || empty(SMTP_HOST) || empty(SMTP_USERNAME) || empty(SMTP_PASSWORD)) {
     respond(false, RESPONSES['constant_error']);
 }
 
-// Enforce POST requests only
+// Accept only POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(false, RESPONSES['method_error']);
 }
 
-// Basic bot detection via User-Agent header
+// Basic bot detection using User-Agent
 $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 if ($userAgent === '' || preg_match('/\b(curl|wget|bot|crawler|spider)\b/i', $userAgent)) {
     respond(false, RESPONSES['honeypot_error']);
 }
 
-// Rate-limiting: allow maximum 5 submissions per hour
+// Enforce session-based rate limiting
 checkSessionRateLimit(MAX_ATTEMPTS, RATE_LIMIT_DURATION);
 
-// Input collection and validation
+// Collect and validate user input
 $date     = new DateTime();
 $ip       = $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
 $email    = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL) ?: respond(false, RESPONSES['enter_email'], 'email');
@@ -95,21 +87,21 @@ $subject  = isset($_POST['subject']) ? sanitize($_POST['subject']) : respond(fal
 $token    = isset($_POST['recaptcha_token']) ? sanitize($_POST['recaptcha_token']) : respond(false, RESPONSES['token_error']);
 $honeypot = trim($_POST['website'] ?? '');
 
-// Honeypot trap (field must stay empty)
+// Honeypot trap (hidden field must remain empty)
 if ($honeypot !== '') {
     respond(false, RESPONSES['honeypot_error']);
 }
 
-// Check if email domain has valid DNS records
+// Check if email domain is valid (DNS MX or A record)
 $domain = substr(strrchr($email, "@"), 1);
 if (!$domain || (!checkdnsrr($domain, 'MX') && !checkdnsrr($domain, 'A'))) {
     respond(false, RESPONSES['domain_error'], 'email');
 }
 
-// Validate reCAPTCHA score and authenticity
+// Verify reCAPTCHA token authenticity and score
 validateRecaptcha($token);
 
-// Compose HTML email body
+// Build email body from template
 $emailBody = renderEmail([
     'subject' => $subject,
     'date'    => $date->format('Y-m-d H:i:s'),
@@ -120,20 +112,19 @@ $emailBody = renderEmail([
 ]);
 
 try {
-    // Send notification to site owner
+    // Send notification email to site owner
     $mail = new PHPMailer(true);
     configureMailer($mail);
     $mail->addAddress(SMTP_USERNAME, 'Admin');
     $mail->addReplyTo($email, $name);
     $mail->Subject = $subject ?: EMAIL_SUBJECT_DEFAULT;
     $mail->Body    = $emailBody;
-    // First convert <br> tags into \n (strip_tags removes <br> without adding line breaks)
-    $alt = preg_replace('/<br\s*\/?>/i', "\n", $emailBody);
+    $alt = preg_replace('/<br\s*\/?>/i', "\n", $emailBody); // First convert <br> tags into \n (strip_tags removes <br> without adding line breaks)
     $alt = trim(strip_tags($alt));
     $mail->AltBody = $alt;
     $mail->send();
 
-    // Send confirmation auto-reply to user
+    // Send autoreply confirmation to user
     $autoReply = new PHPMailer(true);
     configureMailer($autoReply);
     $autoReply->addAddress($email, $name);
@@ -151,14 +142,14 @@ try {
 }
 
 /**
- * Verifies reCAPTCHA token with Google API and checks score, action & hostname
+ * Verify reCAPTCHA token with Google API and validate score, action, and hostname
  *
  * @param string $token reCAPTCHA token submitted by the form
  * @return void
  */
 function validateRecaptcha(string $token): void
 {
-    // Initialize cURL session to verify the token
+    // Initialize cURL request to Google verification API
     $ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
 
     $postFields = http_build_query([
@@ -222,28 +213,27 @@ function validateRecaptcha(string $token): void
 }
 
 /**
- * Cleans and encodes user input to prevent header injection and XSS
+ * Sanitize user input to prevent XSS and header injection
  *
  * @param string $data Raw input string
- * @return string Sanitized string
+ * @return string Cleaned string
  */
 function sanitize(string $data): string
 {
-    // Remove null bytes and other control characters (except \t)
+    // Remove control characters and null bytes
     $data = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/u', '', $data);
 
-    // Escape HTML entities (with strict quote handling and UTF-8 safety)
+    // Escape HTML entities (UTF-8 safe)
     return trim(htmlspecialchars($data, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8', true));
 }
 
 /**
- * Sends a JSON response and terminates the script
+ * Send JSON response and terminate execution
  *
- * @param bool   $success Whether the operation was successful
- * @param string $message Message to be displayed to the user
- * @param string|null $field Optional field name to mark as invalid
- *
- * @return never This function does not return; it ends execution with exit()
+ * @param bool        $success Success flag
+ * @param string      $message Message to display
+ * @param string|null $field   Optional field to highlight as invalid
+ * @return never
  */
 function respond(bool $success, string $message, ?string $field = null): never
 {
@@ -256,10 +246,10 @@ function respond(bool $success, string $message, ?string $field = null): never
 }
 
 /**
- * Renders the email HTML body from template
+ * Render the email body from template file
  *
- * @param array $data Variables to inject into the template
- * @return string HTML content
+ * @param array $data Template variables
+ * @return string HTML email content
  */
 function renderEmail(array $data): string
 {
@@ -281,7 +271,7 @@ function renderEmail(array $data): string
 /**
  * Configures a PHPMailer instance with SMTP settings
  *
- * @param PHPMailer $mailer The PHPMailer instance to configure
+ * @param PHPMailer $mailer Instance to configure
  * @return void
  */
 function configureMailer(PHPMailer $mailer): void
@@ -300,9 +290,9 @@ function configureMailer(PHPMailer $mailer): void
 }
 
 /**
- * Tracks and limits number of submissions per session
+ * Enforce session-based rate limiting
  *
- * @param int $max    Maximum allowed submissions within the window
+ * @param int $max    Max submissions allowed
  * @param int $window Time window in seconds
  * @return void
  */
