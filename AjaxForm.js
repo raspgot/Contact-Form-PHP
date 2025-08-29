@@ -7,105 +7,123 @@
  * Author: Raspgot
  */
 
-const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY'; // Replace with your public reCAPTCHA key
+const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY'; // Replace with your public reCAPTCHA site key
 
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
-    // Get the form element that uses Bootstrap's validation classes
     const form = document.querySelector('.needs-validation');
-    if (!form) return; // Stop if no form is found on the page
+    if (!form) return;
 
-    // Select additional elements: loading spinner, submit button, and alert box
     const spinner = document.getElementById('loading-spinner');
     const submitButton = form.querySelector('button[type="submit"]');
     const alertContainer = document.getElementById('alert-status');
 
-    /**
-     * Enable live validation as the user types or selects options
-     */
-    form.querySelectorAll('input, select, textarea').forEach((field) => {
-        const eventType = field.tagName === 'SELECT' ? 'change' : 'input';
+    let inFlight = false;
 
-        field.addEventListener(eventType, () => {
+    // Live validation
+    form.querySelectorAll('input, select, textarea').forEach((field) => {
+        field.addEventListener(field.tagName === 'SELECT' ? 'change' : 'input', () => {
             if (!field.value.trim()) {
-                // Clear feedback if field is empty
                 field.classList.remove('is-valid', 'is-invalid');
             } else if (field.checkValidity()) {
-                // Field is valid
                 field.classList.add('is-valid');
                 field.classList.remove('is-invalid');
             } else {
-                // Field is invalid
                 field.classList.add('is-invalid');
                 field.classList.remove('is-valid');
             }
         });
     });
 
-    /**
-     * Handle form submission with AJAX
-     */
+    // Handle form submission with AJAX
     form.addEventListener('submit', async (event) => {
-        event.preventDefault(); // Stop the default form submission
-        event.stopPropagation(); // Prevent the event from bubbling up
+        event.preventDefault();
+        event.stopPropagation();
 
-        // Clear any previous validation feedback
+        if (inFlight) return;
+
+        form.classList.remove('was-validated');
         form.querySelectorAll('.is-valid, .is-invalid').forEach((el) => el.classList.remove('is-valid', 'is-invalid'));
 
-        // Check HTML5 field validity (required, pattern, etc.)
+        // Native HTML5 validity check
         if (!form.checkValidity()) {
-            form.classList.add('was-validated'); // Bootstrap validation feedback
-            form.querySelector(':invalid')?.focus(); // Focus first invalid input
+            form.classList.add('was-validated');
+            form.querySelector(':invalid')?.focus();
             return;
         }
 
-        // Show loading spinner and disable the submit button
-        spinner.classList.remove('d-none');
-        submitButton.disabled = true;
+        const formData = new FormData(form);
+        const endpoint = 'AjaxForm.php';
+
+        // Show loading spinner and disable form
+        if (spinner) spinner.classList.remove('d-none');
+        if (submitButton) submitButton.disabled = true;
+        form.querySelectorAll('input, select, textarea, button').forEach((el) => {
+            if (el !== submitButton) el.disabled = true;
+        });
+        inFlight = true;
 
         try {
+            if (!RECAPTCHA_SITE_KEY || RECAPTCHA_SITE_KEY === 'YOUR_RECAPTCHA_SITE_KEY') {
+                throw new Error('⚠️ Missing reCAPTCHA site key.');
+            }
+            if (typeof grecaptcha === 'undefined' || !grecaptcha?.ready) {
+                throw new Error('⚠️ reCAPTCHA not loaded.');
+            }
+
             // Wait for reCAPTCHA to be ready and get the token
-            const token = await new Promise((resolve) => {
-                grecaptcha.ready(() => {
-                    grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' }).then(resolve);
-                });
+            const token = await new Promise((resolve, reject) => {
+                try {
+                    grecaptcha.ready(() => {
+                        grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' }).then(resolve).catch(reject);
+                    });
+                } catch (e) {
+                    reject(e);
+                }
             });
 
-            // Prepare form data, including the reCAPTCHA token
-            const formData = new FormData(form);
+            // Append token to input form
             formData.append('recaptcha_token', token);
 
             // Send data using Fetch API (AJAX)
-            const response = await fetch('AjaxForm.php', {
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 body: formData,
+                headers: { Accept: 'application/json' },
             });
 
-            // If server responded with an error (like 500), throw an exception
-            if (!response.ok) throw new Error('Network error: ' + response.status);
+            if (!response.ok) {
+                throw new Error(`⚠️ Network error: ${response.status}`);
+            }
 
-            // Parse the JSON response from the server
-            const result = await response.json();
-            const { message, success, field } = result;
-            const alertType = success ? 'success' : 'danger';
+            let result;
+            try {
+                result = await response.json();
+            } catch {
+                throw new Error('⚠️ Invalid JSON response.');
+            }
 
-            // Highlight the invalid field if the server specified one
+            const success = !!result?.success;
+            const message = result?.message || (success ? 'Success.' : 'An error occurred.');
+            const field = result?.field;
+
+            // Highlight the invalid field
             if (field) {
-                const fieldEl = form.querySelector(`[name="${field}"]`);
-                if (fieldEl) {
-                    fieldEl.classList.add('is-invalid');
-                    fieldEl.reportValidity(); // Show native tooltip message
-                    fieldEl.focus();
+                const target = form.querySelector(`[name="${CSS.escape(field)}"]`);
+                if (target) {
+                    target.classList.add('is-invalid');
+                    target.focus();
                     form.classList.remove('was-validated');
                 }
             }
 
-            // Display the success or error message
-            alertContainer.className = `alert alert-${alertType} fade show`;
-            alertContainer.textContent = message;
-            alertContainer.classList.remove('d-none');
-            alertContainer.scrollIntoView({ behavior: 'smooth' });
+            if (alertContainer) {
+                alertContainer.className = `alert alert-${success ? 'success' : 'danger'} fade show`;
+                alertContainer.textContent = message;
+                alertContainer.classList.remove('d-none');
+                alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
 
             // If the form was submitted successfully, reset it
             if (success) {
@@ -113,13 +131,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.classList.remove('was-validated');
                 form.querySelectorAll('.is-valid, .is-invalid').forEach((el) => el.classList.remove('is-valid', 'is-invalid'));
             }
-        } catch (error) {
-            // Log unexpected errors (network, parse errors, etc.)
-            console.error('An error occurred:', error);
+        } catch (err) {
+            console.error(err);
+            if (alertContainer) {
+                alertContainer.className = 'alert alert-danger fade show';
+                alertContainer.textContent = err?.message || 'Unexpected error.';
+                alertContainer.classList.remove('d-none');
+            }
         } finally {
-            // Always hide the spinner and re-enable the submit button
-            spinner.classList.add('d-none');
-            submitButton.disabled = false;
+            // Hide loading spinner and enable form
+            if (spinner) spinner.classList.add('d-none');
+            if (submitButton) submitButton.disabled = false;
+            form.querySelectorAll('input, select, textarea, button').forEach((el) => {
+                if (el !== submitButton) el.disabled = false;
+            });
+            inFlight = false;
         }
     });
 });
