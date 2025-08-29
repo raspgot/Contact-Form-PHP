@@ -1,4 +1,4 @@
-# 📬 Contact-Form-PHP
+# Contact-Form-PHP
 
 [![version](https://img.shields.io/badge/version-1.7.3-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
 [![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP)
@@ -13,15 +13,15 @@ Built with **Bootstrap 5**, **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**
 
 ## ✨ Features
 
--   ✅ **PHP 8+ Ready** – Strict types & modern code
--   🎨 **Bootstrap 5 UI** – Responsive and accessible
--   ⚡ **AJAX Submission** – No page reload
--   🤖 **Google reCAPTCHA v3** – Invisible spam protection
--   📧 **PHPMailer SMTP** – Secure email delivery
--   🔁 **Auto-reply** – User confirmation message
--   🚫 **Disposable email detection** – Block throwaway addresses
--   🕵️ **Honeypot traps + Rate limiting** – Anti-bot & anti-abuse
--   🛠️ **Easy customization** – Fields, messages & styles
+-   **PHP 8+ Ready** – Strict types & modern code
+-   **Bootstrap 5 UI** – Responsive and accessible
+-   **AJAX Submission** – No page reload
+-   **Google reCAPTCHA v3** – Invisible spam protection
+-   **PHPMailer SMTP** – Secure email delivery
+-   **Auto-reply** – User confirmation message
+-   **Disposable email detection** – Block throwaway addresses
+-   **Honeypot traps + Rate limiting** – Anti-bot & anti-abuse
+-   **Easy customization** – Fields, messages & styles
 
 ## 🚀 Live Demo
 
@@ -121,7 +121,7 @@ Developed by [**Raspgot**](https://raspgot.fr) — [contact@raspgot.fr](mailto:c
 
 If you find this project useful, please ⭐ star the repository !
 
-## 📚 Dependencies
+## Dependencies
 
 -   [PHPMailer](https://github.com/PHPMailer/PHPMailer)
 -   [Bootstrap](https://github.com/twbs/bootstrap)
