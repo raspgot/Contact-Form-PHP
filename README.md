@@ -19,8 +19,8 @@ Built with **Bootstrap 5**, **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**
 -   **Google reCAPTCHA v3** – Invisible spam protection
 -   **PHPMailer SMTP** – Secure email delivery
 -   **Auto-reply** – User confirmation message
--   **Disposable email detection** – Block throwaway addresses
--   **Honeypot traps + Rate limiting** – Anti-bot & anti-abuse
+-   **Honeypot trap** – Basic anti-bot protection
+-   **Rate limiting** – Prevents abuse (default: 5/hour)
 -   **Easy customization** – Fields, messages & styles
 
 ## 🚀 Live Demo
@@ -99,12 +99,10 @@ extension=curl
 
 ## 🔒 Advanced Features
 
-- **Smart bot blocking** – Detects and blocks suspicious User-Agents using regex patterns  
-- **Email validation** – Verifies DNS (MX records) and rejects disposable addresses  
-- **reCAPTCHA v3 scoring** – Filters out low-trust requests (score < 0.5) silently  
-- **Honeypot field** – Invisible trap to catch automated bots without affecting UX  
-- **Rate limiting** – Restricts to 5 submissions per session per hour to prevent abuse  
-- **Input sanitization** – Protects against header injection and XSS attacks
+-   Regex-based bot User-Agent blocking
+-   DNS & disposable email checks
+-   reCAPTCHA score filtering (min. 0.5)
+-   Header injection & XSS protection
 
 ---
 
