@@ -1,13 +1,15 @@
 <?php
 
 /**
- * Secure Contact Form using PHPMailer & reCAPTCHA v3 with autoreply
+ * This script processes AJAX form submissions, validates input, applies
+ * anti-spam measures (honeypot, rate limiting, DNS & reCAPTCHA checks), and
+ * sends both an admin notification and an optional autoreply to the user
  *
- * @author    Raspgot <contact@raspgot.fr>
- * @link      https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
- * @version   1.7.3
- * @see       https://github.com/PHPMailer/PHPMailer
- * @see       https://developers.google.com/recaptcha/docs/v3
+ * @author   Raspgot <contact@raspgot.fr>
+ * @link     https://github.com/raspgot/AjaxForm-PHPMailer-reCAPTCHA
+ * @version  1.7.4
+ * @see      https://github.com/PHPMailer/PHPMailer
+ * @see      https://developers.google.com/recaptcha/docs/v3
  */
 
 declare(strict_types=1);
@@ -101,7 +103,7 @@ if (!$domain || (!checkdnsrr($domain, 'MX') && !checkdnsrr($domain, 'A'))) {
 // Verify reCAPTCHA token authenticity and score
 validateRecaptcha($token);
 
-// Build email body from template
+// Build email body (HTML) from template
 $emailBody = renderEmail([
     'subject' => $subject,
     'date'    => $date->format('Y-m-d H:i:s'),
@@ -112,28 +114,26 @@ $emailBody = renderEmail([
 ]);
 
 try {
+    // Build minimal plain text alternative part from HTML
+    $altText = buildAltBody($emailBody);
+
     // Send notification email to site owner
-    $mail = new PHPMailer(true);
-    configureMailer($mail);
+    $mail = configureMailer(new PHPMailer(true));
     $mail->addAddress(SMTP_USERNAME, 'Admin');
     $mail->addReplyTo($email, $name);
     $mail->Subject = $subject ?: EMAIL_SUBJECT_DEFAULT;
     $mail->Body    = $emailBody;
-    $alt = preg_replace('/<br\s*\/?>/i', "\n", $emailBody); // First convert <br> tags into \n (strip_tags removes <br> without adding line breaks)
-    $alt = trim(strip_tags($alt));
-    $mail->AltBody = $alt;
+    $mail->AltBody = $altText;
     $mail->send();
 
     // Send autoreply confirmation to user
-    $autoReply = new PHPMailer(true);
-    configureMailer($autoReply);
+    $autoReply = configureMailer(new PHPMailer(true));
     $autoReply->addAddress($email, $name);
     $autoReply->Subject = EMAIL_SUBJECT_AUTOREPLY . ' — ' . $subject;
-    $autoReply->Body = '
-        <p>Hello ' . htmlspecialchars($name) . ',</p>
-        <p>Thank you for reaching out, here is a copy of your message :</p>
-        <hr>' . $emailBody;
-    $autoReply->AltBody = $alt;
+    $autoReply->Body = '<p>Hello ' . htmlspecialchars($name) . ',</p>' .
+        '<p>Thank you for reaching out. Here is a copy of your message:</p>' .
+        '<hr>' . $emailBody;
+    $autoReply->AltBody = $altText;
     $autoReply->send();
 
     respond(true, RESPONSES['success']);
@@ -142,9 +142,22 @@ try {
 }
 
 /**
+ * Create a plain-text alternative body from an HTML email fragment
+ *
+ * @param string $html HTML email body
+ * @return string Plain text version
+ */
+function buildAltBody(string $html): string
+{
+    $text = preg_replace('/<br\s*\/??>/i', "\n", $html) ?? $html;
+    $text = strip_tags($text);
+    return html_entity_decode($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+/**
  * Verify reCAPTCHA token with Google API and validate score, action, and hostname
  *
- * @param string $token reCAPTCHA token submitted by the form
+ * @param string $token The reCAPTCHA token received from the frontend
  * @return void
  */
 function validateRecaptcha(string $token): void
@@ -215,16 +228,19 @@ function validateRecaptcha(string $token): void
 /**
  * Sanitize user input to prevent XSS and header injection
  *
- * @param string $data Raw input string
- * @return string Cleaned string
+ * @param string $data Raw user-supplied input
+ * @return string Sanitized value
  */
 function sanitize(string $data): string
 {
     // Remove control characters and null bytes
-    $data = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/u', '', $data);
+    $filtered = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/u', '', $data);
+    if ($filtered === null) {
+        $filtered = $data; // Fallback to original if regex engine fails
+    }
 
     // Escape HTML entities (UTF-8 safe)
-    return trim(htmlspecialchars($data, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8', true));
+    return trim(htmlspecialchars($filtered, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8', true));
 }
 
 /**
@@ -232,7 +248,7 @@ function sanitize(string $data): string
  *
  * @param bool        $success Success flag
  * @param string      $message Message to display
- * @param string|null $field   Optional field to highlight as invalid
+ * @param string|null $field Optional field to highlight as invalid
  * @return never
  */
 function respond(bool $success, string $message, ?string $field = null): never
@@ -246,10 +262,22 @@ function respond(bool $success, string $message, ?string $field = null): never
 }
 
 /**
- * Render the email body from template file
+ * Render the HTML email body using the external template file
  *
- * @param array $data Template variables
- * @return string HTML email content
+ * @param array{
+ *   subject: string,
+ *   date: string,
+ *   name: string,
+ *   email: string,
+ *   message: string,
+ *   ip: string
+ * } $data Strictly typed template variables
+ *
+ * Extraction uses EXTR_SKIP to avoid overwriting existing variables inside the closure scope
+ * Output buffering captures the template output as a string
+ *
+ * @return string Fully rendered HTML fragment
+ * @throws RuntimeException If the template file cannot be found
  */
 function renderEmail(array $data): string
 {
@@ -269,12 +297,12 @@ function renderEmail(array $data): string
 }
 
 /**
- * Configures a PHPMailer instance with SMTP settings
+ * Configure a PHPMailer instance with project SMTP defaults
  *
- * @param PHPMailer $mailer Instance to configure
- * @return void
+ * @param PHPMailer $mailer The PHPMailer instance to configure
+ * @return PHPMailer Configured PHPMailer instance
  */
-function configureMailer(PHPMailer $mailer): void
+function configureMailer(PHPMailer $mailer): PHPMailer
 {
     $mailer->isSMTP();
     $mailer->Host       = SMTP_HOST;
@@ -287,12 +315,13 @@ function configureMailer(PHPMailer $mailer): void
     $mailer->Sender     = SMTP_USERNAME;
     $mailer->isHTML(true);
     $mailer->CharSet    = 'UTF-8';
+    return $mailer;
 }
 
 /**
- * Enforce session-based rate limiting
+ * Enforce a simple session-based rate limit
  *
- * @param int $max    Max submissions allowed
+ * @param int $max Max submissions allowed
  * @param int $window Time window in seconds
  * @return void
  */
