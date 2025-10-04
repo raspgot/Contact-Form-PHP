@@ -35,7 +35,7 @@ Built with **Bootstrap 5**, **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**
     git clone https://github.com/raspgot/Contact-Form-PHP.git
     ```
 
-    Or [download ZIP](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip)
+    Or [download ZIP](https://github.com/raspgot/Contact-Form-PHP/archive/master.zip) and extract it
 
 2. **Run locally** with PHP:
 
@@ -49,7 +49,7 @@ Built with **Bootstrap 5**, **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**
 
 ### 1. Configure backend
 
-Get your reCAPTCHA secret key at [Google reCAPTCHA admin](https://www.google.com/recaptcha/admin)
+Get your reCAPTCHA secret key from the [Google reCAPTCHA Console](https://console.cloud.google.com/security/recaptcha/create)
 
 Edit **`AjaxForm.php`** with your credentials:
 
@@ -62,7 +62,9 @@ const SMTP_SECURE   = 'tls';
 const SMTP_PORT     = 587;
 ```
 
-> **Note:** Enable `php_curl` in `php.ini`
+> **Note:** Enable `php_curl` in `php.ini`.
+> 
+> This extension allows PHP to make HTTP requests (for example, to verify reCAPTCHA or send emails via some SMTP providers). Without it, the contact form will not work properly
 
 ```ini
 extension=curl
@@ -100,8 +102,8 @@ extension=curl
 ## 🔒 Advanced Features
 
 -   Regex-based bot User-Agent blocking
--   DNS & disposable email checks
--   reCAPTCHA score filtering (min. 0.5)
+-   DNS email domain (MX / A) validation
+-   reCAPTCHA v3 verification – threshold currently 0.6
 -   Header injection & XSS protection
 
 ---
