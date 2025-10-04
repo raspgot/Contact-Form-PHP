@@ -7,23 +7,44 @@
  * Author: Raspgot
  */
 
-const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY'; // Replace with your public reCAPTCHA site key
+/**
+ * Public reCAPTCHA v3 site key (frontend only)
+ * Replace this placeholder with your actual key
+ * @constant {string}
+ */
+const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
+
+/**
+ * @typedef {Object} AjaxResponse
+ * @property {boolean} success Indicates if backend processing succeeded
+ * @property {string}  message Human readable status or error
+ * @property {string=} field Optional form field name that failed validation
+ */
+
+/**
+ * @typedef {HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement} FormControl
+ */
 
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
+    /** @type {HTMLFormElement|null} */
     const form = document.querySelector('.needs-validation');
     if (!form) return;
 
+    /** @type {HTMLElement|null} */
     const spinner = document.getElementById('loading-spinner');
+    /** @type {HTMLButtonElement|null} */
     const submitButton = form.querySelector('button[type="submit"]');
+    /** @type {HTMLElement|null} */
     const alertContainer = document.getElementById('alert-status');
-
+    /** @type {boolean} */
     let inFlight = false;
 
     // Live validation
     form.querySelectorAll('input, select, textarea').forEach((field) => {
-        field.addEventListener(field.tagName === 'SELECT' ? 'change' : 'input', () => {
+        const eventName = field.tagName === 'SELECT' ? 'change' : 'input';
+        field.addEventListener(eventName, () => {
             if (!field.value.trim()) {
                 field.classList.remove('is-valid', 'is-invalid');
             } else if (field.checkValidity()) {
@@ -92,11 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData,
                 headers: { Accept: 'application/json' },
             });
+            if (!response.ok) throw new Error(`⚠️ Network error: ${response.status}`);
 
-            if (!response.ok) {
-                throw new Error(`⚠️ Network error: ${response.status}`);
-            }
-
+            /** @type {AjaxResponse} */
             let result;
             try {
                 result = await response.json();
