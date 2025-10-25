@@ -8,163 +8,183 @@
  */
 
 /**
- * Public reCAPTCHA v3 site key (frontend only)
- * Replace this placeholder with your actual key
+ * reCAPTCHA v3 public site key (visible in frontend code)
+ * ⚠️ Replace with your own key from https://www.google.com/recaptcha/admin
  * @constant {string}
  */
 const RECAPTCHA_SITE_KEY = 'YOUR_RECAPTCHA_SITE_KEY';
 
 /**
+ * Backend JSON response shape
  * @typedef {Object} AjaxResponse
- * @property {boolean} success Indicates if backend processing succeeded
- * @property {string}  message Human readable status or error
- * @property {string=} field Optional form field name that failed validation
- */
-
-/**
- * @typedef {HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement} FormControl
+ * @property {boolean} success - True if message was sent successfully
+ * @property {string}  message - User-facing status message
+ * @property {string=} field   - Name of the form field that failed (optional)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
-    /** @type {HTMLFormElement|null} */
+    // 1. Find form and required DOM elements
     const form = document.querySelector('.needs-validation');
-    if (!form) return;
+    if (!form) return; // Exit if form not found on page
 
-    /** @type {HTMLElement|null} */
     const spinner = document.getElementById('loading-spinner');
-    /** @type {HTMLButtonElement|null} */
     const submitButton = form.querySelector('button[type="submit"]');
-    /** @type {HTMLElement|null} */
     const alertContainer = document.getElementById('alert-status');
-    /** @type {boolean} */
-    let inFlight = false;
+    
+    let isSubmitting = false; // Prevent duplicate submissions
 
-    // Live validation
+    // 2. Setup live validation (show green/red feedback as user types)
     form.querySelectorAll('input, select, textarea').forEach((field) => {
-        const eventName = field.tagName === 'SELECT' ? 'change' : 'input';
-        field.addEventListener(eventName, () => {
-            if (!field.value.trim()) {
+        const eventType = field.tagName === 'SELECT' ? 'change' : 'input';
+        
+        field.addEventListener(eventType, () => {
+            const isEmpty = !field.value.trim();
+            const isValid = field.checkValidity();
+
+            // Remove all validation classes if field is empty
+            if (isEmpty) {
                 field.classList.remove('is-valid', 'is-invalid');
-            } else if (field.checkValidity()) {
+            }
+            // Show green checkmark if valid
+            else if (isValid) {
                 field.classList.add('is-valid');
                 field.classList.remove('is-invalid');
-            } else {
+            }
+            // Show red error if invalid
+            else {
                 field.classList.add('is-invalid');
                 field.classList.remove('is-valid');
             }
         });
     });
 
-    // Handle form submission with AJAX
+    // 3. Handle form submission
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         event.stopPropagation();
 
-        if (inFlight) return;
+        // Ignore if already submitting
+        if (isSubmitting) return;
 
+        // Reset any previous validation styling
         form.classList.remove('was-validated');
-        form.querySelectorAll('.is-valid, .is-invalid').forEach((el) => el.classList.remove('is-valid', 'is-invalid'));
+        form.querySelectorAll('.is-valid, .is-invalid').forEach((el) => {
+            el.classList.remove('is-valid', 'is-invalid');
+        });
 
-        // Native HTML5 validity check
+        // Check HTML5 built-in validation (required, email format, etc.)
         if (!form.checkValidity()) {
             form.classList.add('was-validated');
-            form.querySelector(':invalid')?.focus();
+            form.querySelector(':invalid')?.focus(); // Focus first invalid field
             return;
         }
 
+        // Prepare form data for sending
         const formData = new FormData(form);
-        const endpoint = 'AjaxForm.php';
+        const backendURL = 'AjaxForm.php';
 
-        // Show loading spinner and disable form
+        // Disable form to prevent changes during submission
         if (spinner) spinner.classList.remove('d-none');
         if (submitButton) submitButton.disabled = true;
-        form.querySelectorAll('input, select, textarea, button').forEach((el) => {
-            if (el !== submitButton) el.disabled = true;
+        form.querySelectorAll('input, select, textarea, button').forEach((element) => {
+            if (element !== submitButton) element.disabled = true;
         });
-        inFlight = true;
+        isSubmitting = true;
 
         try {
+            // Step 1: Verify reCAPTCHA is loaded
             if (!RECAPTCHA_SITE_KEY || RECAPTCHA_SITE_KEY === 'YOUR_RECAPTCHA_SITE_KEY') {
                 throw new Error('⚠️ Missing reCAPTCHA site key.');
             }
             if (typeof grecaptcha === 'undefined' || !grecaptcha?.ready) {
-                throw new Error('⚠️ reCAPTCHA not loaded.');
+                throw new Error('⚠️ reCAPTCHA script not loaded.');
             }
 
-            // Wait for reCAPTCHA to be ready and get the token
-            const token = await new Promise((resolve, reject) => {
+            // Step 2: Get reCAPTCHA token (proves user is human)
+            const recaptchaToken = await new Promise((resolve, reject) => {
                 try {
                     grecaptcha.ready(() => {
-                        grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' }).then(resolve).catch(reject);
+                        grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit' })
+                            .then(resolve)
+                            .catch(reject);
                     });
-                } catch (e) {
-                    reject(e);
+                } catch (error) {
+                    reject(error);
                 }
             });
 
-            // Append token to input form
-            formData.append('recaptcha_token', token);
+            // Add token to form data
+            formData.append('recaptcha_token', recaptchaToken);
 
-            // Send data using Fetch API (AJAX)
-            const response = await fetch(endpoint, {
+            // Step 3: Send form data to backend
+            const response = await fetch(backendURL, {
                 method: 'POST',
                 body: formData,
                 headers: { Accept: 'application/json' },
             });
-            if (!response.ok) throw new Error(`⚠️ Network error: ${response.status}`);
 
-            /** @type {AjaxResponse} */
-            let result;
-            try {
-                result = await response.json();
-            } catch {
-                throw new Error('⚠️ Invalid JSON response.');
+            if (!response.ok) {
+                throw new Error(`⚠️ Network error: ${response.status}`);
             }
 
-            const success = !!result?.success;
-            const message = result?.message || (success ? 'Success.' : 'An error occurred.');
-            const field = result?.field;
+            // Step 4: Parse JSON response
+            /** @type {AjaxResponse} */
+            let data;
+            try {
+                data = await response.json();
+            } catch {
+                throw new Error('⚠️ Invalid JSON response from server.');
+            }
 
-            // Highlight the invalid field
-            if (field) {
-                const target = form.querySelector(`[name="${CSS.escape(field)}"]`);
-                if (target) {
-                    target.classList.add('is-invalid');
-                    target.focus();
+            const wasSuccessful = !!data?.success;
+            const statusMessage = data?.message || (wasSuccessful ? 'Success.' : 'An error occurred.');
+            const invalidFieldName = data?.field;
+
+            // Highlight specific field if backend indicates validation error
+            if (invalidFieldName) {
+                const invalidField = form.querySelector(`[name="${CSS.escape(invalidFieldName)}"]`);
+                if (invalidField) {
+                    invalidField.classList.add('is-invalid');
+                    invalidField.focus();
                     form.classList.remove('was-validated');
                 }
             }
 
+            // Show success or error alert
             if (alertContainer) {
-                alertContainer.className = `alert alert-${success ? 'success' : 'danger'} fade show`;
-                alertContainer.textContent = message;
+                alertContainer.className = `alert alert-${wasSuccessful ? 'success' : 'danger'} fade show`;
+                alertContainer.textContent = statusMessage;
                 alertContainer.classList.remove('d-none');
                 alertContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
-            // If the form was submitted successfully, reset it
-            if (success) {
+            // Reset form on success
+            if (wasSuccessful) {
                 form.reset();
                 form.classList.remove('was-validated');
-                form.querySelectorAll('.is-valid, .is-invalid').forEach((el) => el.classList.remove('is-valid', 'is-invalid'));
+                form.querySelectorAll('.is-valid, .is-invalid').forEach((el) => {
+                    el.classList.remove('is-valid', 'is-invalid');
+                });
             }
-        } catch (err) {
-            console.error(err);
+        } catch (error) {
+            console.error(error);
+            
+            // Show error alert
             if (alertContainer) {
                 alertContainer.className = 'alert alert-danger fade show';
-                alertContainer.textContent = err?.message || 'Unexpected error.';
+                alertContainer.textContent = error?.message || 'Unexpected error.';
                 alertContainer.classList.remove('d-none');
             }
         } finally {
-            // Hide loading spinner and enable form
+            // Re-enable form
             if (spinner) spinner.classList.add('d-none');
             if (submitButton) submitButton.disabled = false;
-            form.querySelectorAll('input, select, textarea, button').forEach((el) => {
-                if (el !== submitButton) el.disabled = false;
+            form.querySelectorAll('input, select, textarea, button').forEach((element) => {
+                if (element !== submitButton) element.disabled = false;
             });
-            inFlight = false;
+            isSubmitting = false;
         }
     });
 });
