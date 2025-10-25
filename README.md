@@ -1,6 +1,6 @@
 # Contact-Form-PHP
 
-[![version](https://img.shields.io/badge/version-1.7.3-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
+[![version](https://img.shields.io/badge/version-1.7.5-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
 [![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP)
 [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
@@ -22,6 +22,10 @@ Built with **Bootstrap 5**, **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**
 -   **Honeypot trap** – Basic anti-bot protection
 -   **Rate limiting** – Prevents abuse (default: 5/hour)
 -   **Easy customization** – Fields, messages & styles
+-   **Regex-based bot User-Agent blocking**
+-   **DNS email domain (MX/A) validation**
+-   **reCAPTCHA v3 verification** – Default threshold 0.6
+-   **Header injection and XSS protection**
 
 ## 🚀 Live Demo
 
@@ -62,9 +66,8 @@ const SMTP_SECURE   = 'tls';
 const SMTP_PORT     = 587;
 ```
 
-> **Note:** Enable `php_curl` in `php.ini`.
-> 
-> This extension allows PHP to make HTTP requests (for example, to verify reCAPTCHA or send emails via some SMTP providers). Without it, the contact form will not work properly
+> **Note:** Enable `php_curl` in `php.ini`
+ This extension allows PHP to make HTTP requests (to verify reCAPTCHA or send emails via some SMTP providers)
 
 ```ini
 extension=curl
@@ -96,15 +99,6 @@ extension=curl
     const MAX_ATTEMPTS = 5;
     const RATE_LIMIT_DURATION = 3600; // in seconds
     ```
-
----
-
-## 🔒 Advanced Features
-
--   Regex-based bot User-Agent blocking
--   DNS email domain (MX / A) validation
--   reCAPTCHA v3 verification – threshold currently 0.6
--   Header injection & XSS protection
 
 ---
 
