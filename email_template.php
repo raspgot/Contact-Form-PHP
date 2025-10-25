@@ -59,7 +59,7 @@
                     <tr>
                         <td align="left" style="background:#2563eb; padding:24px; font-size:20px; line-height:24px; font-weight:700; color:#ffffff; font-family:Arial,Helvetica,sans-serif;" class="h1">
                             <span class="badge" style="display:inline-block; background:#1d4ed8; color:#fff; padding:4px 10px; font-size:11px; line-height:1; letter-spacing:.5px; border-radius:3px; text-transform:uppercase;">Message</span><br style="line-height:20px;" />
-                            <?= htmlspecialchars($subject, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
+                            <?= $subject; ?>
                         </td>
                     </tr>
                     <tr>
@@ -98,7 +98,7 @@
                                             <?php $replySubject = rawurlencode('Re: ' . $subject); ?>
                                             <a href="mailto:<?= $email; ?>?subject=<?= $replySubject; ?>"
                                                 style="display:inline-block; background:#2563eb; color:#ffffff; text-decoration:none; font-size:14px; line-height:18px; padding:12px 20px; border-radius:4px; font-weight:600; font-family:Arial,Helvetica,sans-serif;">
-                                                Reply to <?= htmlspecialchars($name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
+                                                Reply to <?= $name; ?>
                                             </a>
                                         </td>
                                     </tr>
