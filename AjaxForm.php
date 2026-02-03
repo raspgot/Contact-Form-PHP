@@ -220,7 +220,6 @@ try {
 
     // Success! Return positive response
     respond(true, RESPONSES['success']);
-    
 } catch (Exception $e) {
     // Email sending failed (SMTP error, network issue, etc.)
     respond(false, '❌ Mail error: ' . $e->getMessage(), 'email');
@@ -423,18 +422,18 @@ function checkSessionRateLimit(int $max = 5, int $window = 3600): void
 {
     $now = time();
     $_SESSION['rate_limit_times'] ??= [];
-    
+
     // Remove timestamps older than the window
     $_SESSION['rate_limit_times'] = array_filter(
         $_SESSION['rate_limit_times'],
         fn($timestamp) => $timestamp >= ($now - $window)
     );
-    
+
     // Block if too many recent submissions
     if (count($_SESSION['rate_limit_times']) >= $max) {
         respond(false, RESPONSES['limit_rate_error']);
     }
-    
+
     // Record this submission
     $_SESSION['rate_limit_times'][] = $now;
 }
