@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  php:
+    image: php:8.2-apache
+    container_name: contact-form-php
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - PHP_DISPLAY_ERRORS=On
+    command: >
+      bash -c "
+      docker-php-ext-install mysqli &&
+      a2enmod rewrite &&
+      apache2-foreground
+      "
+    networks:
+      - contact-form-network
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: contact-form-mailhog
+    ports:
+      - "8025:8025"  # Web UI
+      - "1025:1025"  # SMTP server
+    networks:
+      - contact-form-network
+
+networks:
+  contact-form-network:
+    driver: bridge

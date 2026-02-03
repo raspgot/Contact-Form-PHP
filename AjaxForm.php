@@ -17,8 +17,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Always return responses as JSON
-header('Content-Type: application/json');
+// Security Headers
+header('Content-Type: application/json; charset=utf-8');
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('X-XSS-Protection: 1; mode=block');
+header('Referrer-Policy: strict-origin-when-cross-origin');
 
 // Import PHPMailer classes
 use PHPMailer\PHPMailer\PHPMailer;
@@ -29,22 +33,59 @@ require_once __DIR__ . '/PHPMailer/SMTP.php';
 require_once __DIR__ . '/PHPMailer/Exception.php';
 
 // ============================================================================
-// CONFIGURATION (⚠️ Must be customized before deployment)
+// CONFIGURATION (Load from external config file for security)
 // ============================================================================
 
-const SECRET_KEY              = '';                              // reCAPTCHA secret key
-const SMTP_HOST               = '';                              // SMTP server address
-const SMTP_USERNAME           = '';                              // Email account / sender
-const SMTP_PASSWORD           = '';                              // Email password
-const SMTP_SECURE             = 'tls';                           // Encryption: "tls" or "ssl"
-const SMTP_PORT               = 587;                             // Port: 587 (TLS) or 465 (SSL)
-const SMTP_AUTH               = true;                            // Enable SMTP authentication
-const FROM_NAME               = 'Raspgot';                       // Sender display name
-const EMAIL_SUBJECT_DEFAULT   = '[GitHub] New message received'; // Default subject if empty
-const EMAIL_SUBJECT_AUTOREPLY = 'We have received your message'; // Auto-reply subject
-const MAX_ATTEMPTS            = 5;                               // Max submissions per session
-const RATE_LIMIT_DURATION     = 3600;                            // Rate limit window (1 hour)
-const RECAPTCHA_MIN_SCORE     = 0.6;                             // Minimum bot score (0.0 - 1.0)
+// Try to load configuration from config.php (user's actual config)
+$configFile = __DIR__ . '/config.php';
+if (!file_exists($configFile)) {
+    // Fallback to inline constants for backward compatibility
+    $config = [
+        'recaptcha' => [
+            'secret_key' => defined('SECRET_KEY') ? SECRET_KEY : '',
+            'min_score'  => defined('RECAPTCHA_MIN_SCORE') ? RECAPTCHA_MIN_SCORE : 0.6,
+        ],
+        'smtp' => [
+            'host'     => defined('SMTP_HOST') ? SMTP_HOST : '',
+            'username' => defined('SMTP_USERNAME') ? SMTP_USERNAME : '',
+            'password' => defined('SMTP_PASSWORD') ? SMTP_PASSWORD : '',
+            'secure'   => defined('SMTP_SECURE') ? SMTP_SECURE : 'tls',
+            'port'     => defined('SMTP_PORT') ? SMTP_PORT : 587,
+            'auth'     => defined('SMTP_AUTH') ? SMTP_AUTH : true,
+        ],
+        'email' => [
+            'from_name'         => defined('FROM_NAME') ? FROM_NAME : 'Contact Form',
+            'subject_default'   => defined('EMAIL_SUBJECT_DEFAULT') ? EMAIL_SUBJECT_DEFAULT : '[Contact Form] New message',
+            'subject_autoreply' => defined('EMAIL_SUBJECT_AUTOREPLY') ? EMAIL_SUBJECT_AUTOREPLY : 'We have received your message',
+        ],
+        'security' => [
+            'max_attempts'       => defined('MAX_ATTEMPTS') ? MAX_ATTEMPTS : 5,
+            'rate_limit_window'  => defined('RATE_LIMIT_DURATION') ? RATE_LIMIT_DURATION : 3600,
+            'max_name_length'    => 100,
+            'max_subject_length' => 200,
+            'max_message_length' => 5000,
+        ],
+    ];
+} else {
+    $config = require $configFile;
+}
+
+// Define backward-compatible constants if not already defined
+if (!defined('SECRET_KEY')) {
+    define('SECRET_KEY', $config['recaptcha']['secret_key'] ?? '');
+    define('RECAPTCHA_MIN_SCORE', $config['recaptcha']['min_score'] ?? 0.6);
+    define('SMTP_HOST', $config['smtp']['host'] ?? '');
+    define('SMTP_USERNAME', $config['smtp']['username'] ?? '');
+    define('SMTP_PASSWORD', $config['smtp']['password'] ?? '');
+    define('SMTP_SECURE', $config['smtp']['secure'] ?? 'tls');
+    define('SMTP_PORT', $config['smtp']['port'] ?? 587);
+    define('SMTP_AUTH', $config['smtp']['auth'] ?? true);
+    define('FROM_NAME', $config['email']['from_name'] ?? 'Contact Form');
+    define('EMAIL_SUBJECT_DEFAULT', $config['email']['subject_default'] ?? '[Contact Form] New message');
+    define('EMAIL_SUBJECT_AUTOREPLY', $config['email']['subject_autoreply'] ?? 'We have received your message');
+    define('MAX_ATTEMPTS', $config['security']['max_attempts'] ?? 5);
+    define('RATE_LIMIT_DURATION', $config['security']['rate_limit_window'] ?? 3600);
+}
 
 // ============================================================================
 // USER-FACING ERROR MESSAGES
@@ -105,6 +146,23 @@ $message  = isset($_POST['message']) ? sanitize($_POST['message']) : respond(fal
 $subject  = isset($_POST['subject']) ? sanitize($_POST['subject']) : respond(false, RESPONSES['enter_subject']);
 $honeypot = trim($_POST['website'] ?? '');
 $token    = isset($_POST['recaptcha_token']) ? $_POST['recaptcha_token'] : respond(false, RESPONSES['token_error']);
+
+// Validate input lengths to prevent DoS attacks
+$maxLengths = $config['security'] ?? [
+    'max_name_length'    => 100,
+    'max_subject_length' => 200,
+    'max_message_length' => 5000,
+];
+
+if (mb_strlen($name) > $maxLengths['max_name_length']) {
+    respond(false, '⚠️ Name is too long (max ' . $maxLengths['max_name_length'] . ' characters).', 'name');
+}
+if (mb_strlen($subject) > $maxLengths['max_subject_length']) {
+    respond(false, '⚠️ Subject is too long (max ' . $maxLengths['max_subject_length'] . ' characters).', 'subject');
+}
+if (mb_strlen($message) > $maxLengths['max_message_length']) {
+    respond(false, '⚠️ Message is too long (max ' . $maxLengths['max_message_length'] . ' characters).', 'message');
+}
 
 // Honeypot trap: bots fill this hidden field, humans don't see it
 if ($honeypot !== '') {

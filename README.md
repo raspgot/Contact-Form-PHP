@@ -3,7 +3,8 @@
 [![version](https://img.shields.io/badge/version-1.7.5-blue.svg)](https://github.com/raspgot/Contact-Form-PHP)
 [![code size](https://img.shields.io/github/languages/code-size/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP)
 [![closed issues](https://img.shields.io/github/issues-closed-raw/raspgot/Contact-Form-PHP)](https://github.com/raspgot/Contact-Form-PHP/issues?q=is%3Aissue+is%3Aclosed)
-![php](https://img.shields.io/badge/PHP-7/8+-777BB4?logo=php)
+![php](https://img.shields.io/badge/PHP-7.4/8+-777BB4?logo=php)
+[![CI](https://github.com/raspgot/Contact-Form-PHP/workflows/PHP%20CI/badge.svg)](https://github.com/raspgot/Contact-Form-PHP/actions)
 [![stars](https://img.shields.io/github/stars/raspgot/Contact-Form-PHP?style=social)](https://github.com/raspgot/Contact-Form-PHP/stargazers)
 
 A **modern**, **secure** and **lightweight** contact form for PHP projects    
@@ -54,17 +55,42 @@ Built with **Bootstrap 5**, **AJAX**, **PHPMailer**, and **Google reCAPTCHA v3**
 
 ### 1. Configure backend
 
-Get your reCAPTCHA secret key from the [Google reCAPTCHA Console](https://console.cloud.google.com/security/recaptcha/create)
+**Option A: Using config file (Recommended for security)**
 
-Edit **`AjaxForm.php`** with your credentials:
+1. Copy the example configuration:
+   ```bash
+   cp config.example.php config.php
+   ```
 
+2. Get your reCAPTCHA secret key from the [Google reCAPTCHA Console](https://console.cloud.google.com/security/recaptcha/create)
+
+3. Edit `config.php` with your credentials:
+   ```php
+   return [
+       'recaptcha' => [
+           'secret_key' => 'your_recaptcha_secret_key',
+           'min_score'  => 0.6,
+       ],
+       'smtp' => [
+           'host'     => 'smtp.yourprovider.com',
+           'username' => 'you@example.com',
+           'password' => 'yourpassword',
+           'secure'   => 'tls',
+           'port'     => 587,
+       ],
+   ];
+   ```
+
+4. **Important:** Never commit `config.php` to version control! It's already in `.gitignore`.
+
+**Option B: Using constants (Legacy method)**
+
+Edit constants directly in `AjaxForm.php`:
 ```php
 const SECRET_KEY    = 'your_recaptcha_secret_key';
 const SMTP_HOST     = 'smtp.yourprovider.com';
 const SMTP_USERNAME = 'you@example.com';
 const SMTP_PASSWORD = 'yourpassword';
-const SMTP_SECURE   = 'tls';
-const SMTP_PORT     = 587;
 ```
 
 > **Note:** Enable `php_curl` in `php.ini`
@@ -105,7 +131,7 @@ extension=curl
 
 ## Contributing
 
-Issues and PRs are welcome !
+Issues and PRs are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 

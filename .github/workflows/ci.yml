@@ -1,0 +1,89 @@
+name: PHP CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    name: Test PHP ${{ matrix.php-version }}
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: ['7.4', '8.0', '8.1', '8.2', '8.3']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: mbstring, curl, json
+        coverage: none
+    
+    - name: Validate composer.json
+      run: composer validate --strict
+    
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+    
+    - name: Run tests
+      run: composer test
+      if: always()
+
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, curl, json
+    
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+    
+    - name: Check coding standards
+      run: composer cs-check
+      continue-on-error: true
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+    
+    - name: Security check for PHP
+      run: |
+        # Check for common security issues in PHP files
+        echo "Checking for hardcoded credentials..."
+        ! grep -r "password.*=.*['\"].*['\"]" --include="*.php" --exclude-dir=vendor --exclude-dir=PHPMailer . || echo "⚠️ Warning: Possible hardcoded credentials found"
+        
+        echo "Checking for eval() usage..."
+        ! grep -r "eval(" --include="*.php" --exclude-dir=vendor --exclude-dir=PHPMailer . || echo "⚠️ Warning: eval() usage found"
+        
+        echo "Security scan completed!"
