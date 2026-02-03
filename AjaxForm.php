@@ -15,10 +15,14 @@ declare(strict_types=1);
 // Start session (required for rate limiting) with secure cookie settings
 if (session_status() === PHP_SESSION_NONE) {
     // Configure secure session parameters
+    // Extract hostname without port for cookie domain
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $cookieDomain = preg_replace('/:\d+$/', '', $host); // Remove port if present
+    
     $sessionCookieParams = [
         'lifetime' => 0,                    // Session cookie (expires on browser close)
         'path'     => '/',
-        'domain'   => $_SERVER['HTTP_HOST'] ?? '',
+        'domain'   => $cookieDomain,
         'secure'   => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',  // HTTPS only
         'httponly' => true,                 // Prevent JavaScript access
         'samesite' => 'Strict'              // CSRF protection
