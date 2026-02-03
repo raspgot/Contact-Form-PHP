@@ -3,10 +3,15 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- Security headers -->
+        <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+        <meta http-equiv="X-Frame-Options" content="DENY" />
+        <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
         <title>Contact Form</title>
 
         <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-7L0hCaLdJnFzHBMHePIYXDdeMmZmhWA/DwQnZGzzLTsJXNYBUwxZ2dRc9nxQnqnL" crossorigin="anonymous" />
     </head>
 
     <body>
@@ -75,7 +80,7 @@
         <!-- reCAPTCHA v3 (replace with your site key) -->
         <script defer src="https://www.google.com/recaptcha/api.js?render=YOUR_RECAPTCHA_SITE_KEY"></script>
         <!-- Bootstrap Bundle -->
-        <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-JxF7+cBoFDZzwk+Sq9EzZlzJZG2cRlN6z9vEMdxvI5r/j7E+Wf5IqVWoJ/jA8xNv" crossorigin="anonymous"></script>
         <!-- Custom JS handling AJAX form submission -->
         <script src="AjaxForm.js"></script>
         <!-- GitHub Button script (optional) -->

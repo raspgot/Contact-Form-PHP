@@ -12,10 +12,32 @@
 
 declare(strict_types=1);
 
-// Start session (required for rate limiting)
+// Start session (required for rate limiting) with secure cookie settings
 if (session_status() === PHP_SESSION_NONE) {
+    // Configure secure session parameters
+    $sessionCookieParams = [
+        'lifetime' => 0,                    // Session cookie (expires on browser close)
+        'path'     => '/',
+        'domain'   => $_SERVER['HTTP_HOST'] ?? '',
+        'secure'   => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',  // HTTPS only
+        'httponly' => true,                 // Prevent JavaScript access
+        'samesite' => 'Strict'              // CSRF protection
+    ];
+    session_set_cookie_params($sessionCookieParams);
     session_start();
+    
+    // Regenerate session ID to prevent session fixation attacks
+    if (!isset($_SESSION['initiated'])) {
+        session_regenerate_id(true);
+        $_SESSION['initiated'] = true;
+    }
 }
+
+// Security headers
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('X-XSS-Protection: 1; mode=block');
+header('Referrer-Policy: strict-origin-when-cross-origin');
 
 // Always return responses as JSON
 header('Content-Type: application/json');
@@ -62,6 +84,7 @@ const RESPONSES = [
     'constant_error'   => '⚠️ Missing configuration constants.',
     'honeypot_error'   => '🚫 Spam detected.',
     'limit_rate_error' => '🚫 Too many messages sent. Please try again later.',
+    'csrf_error'       => '⚠️ Invalid security token. Please refresh the page.',
 ];
 
 // ============================================================================
@@ -79,6 +102,12 @@ if (empty(SECRET_KEY) || empty(SMTP_HOST) || empty(SMTP_USERNAME) || empty(SMTP_
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(false, RESPONSES['method_error']);
+}
+
+// Verify CSRF token to prevent cross-site request forgery
+if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || 
+    !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    respond(false, RESPONSES['csrf_error']);
 }
 
 // Block suspicious User-Agents (bots, scrapers, command-line tools)
@@ -165,7 +194,10 @@ try {
     
 } catch (Exception $e) {
     // Email sending failed (SMTP error, network issue, etc.)
-    respond(false, '❌ Mail error: ' . $e->getMessage(), 'email');
+    // Log the detailed error for administrators
+    error_log('Contact form mail error: ' . $e->getMessage());
+    // Return generic error to users to avoid information disclosure
+    respond(false, '❌ Unable to send email. Please try again later.', 'email');
 }
 
 // ============================================================================
@@ -220,37 +252,43 @@ function validateRecaptcha(string $token): void
 
     // Check 1: cURL request succeeded
     if ($response === false) {
-        respond(false, '❌ reCAPTCHA request failed: ' . ($curlError ?: 'Unknown cURL error.'));
+        error_log('reCAPTCHA cURL error: ' . ($curlError ?: 'Unknown error'));
+        respond(false, '❌ Unable to verify reCAPTCHA. Please try again.');
     }
 
     // Check 2: Google returned HTTP 200
     if ($httpCode !== 200) {
-        respond(false, '❌ reCAPTCHA HTTP error: ' . $httpCode);
+        error_log('reCAPTCHA HTTP error: ' . $httpCode);
+        respond(false, '❌ Unable to verify reCAPTCHA. Please try again.');
     }
 
     $data = json_decode($response, true);
 
     // Check 3: Valid JSON response
     if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
-        respond(false, '❌ Invalid JSON response from reCAPTCHA.');
+        error_log('reCAPTCHA invalid JSON response');
+        respond(false, '❌ Unable to verify reCAPTCHA. Please try again.');
     }
 
     // Check 4: Google says token is valid
     if (empty($data['success'])) {
         $errors = isset($data['error-codes']) ? implode(', ', $data['error-codes']) : 'Unknown error.';
-        respond(false, '❌ reCAPTCHA verification failed: ' . $errors);
+        error_log('reCAPTCHA verification failed: ' . $errors);
+        respond(false, '❌ reCAPTCHA verification failed. Please try again.');
     }
 
     // Check 5: Action matches (prevents token reuse across different forms)
     $expectedAction = 'submit';
     if (($data['action'] ?? '') !== $expectedAction) {
-        respond(false, '❌ reCAPTCHA action mismatch.');
+        error_log('reCAPTCHA action mismatch: expected ' . $expectedAction . ', got ' . ($data['action'] ?? 'none'));
+        respond(false, '❌ reCAPTCHA verification failed. Please try again.');
     }
 
     // Check 6: Hostname matches (prevents token theft from other sites)
     $expectedHost = $_SERVER['SERVER_NAME'] ?? '';
     if (!empty($expectedHost) && ($data['hostname'] ?? '') !== $expectedHost) {
-        respond(false, '❌ reCAPTCHA hostname mismatch.');
+        error_log('reCAPTCHA hostname mismatch: expected ' . $expectedHost . ', got ' . ($data['hostname'] ?? 'none'));
+        respond(false, '❌ reCAPTCHA verification failed. Please try again.');
     }
 
     // Check 7: Score is above minimum threshold (0.0 = bot, 1.0 = human)
@@ -379,4 +417,19 @@ function checkSessionRateLimit(int $max = 5, int $window = 3600): void
     
     // Record this submission
     $_SESSION['rate_limit_times'][] = $now;
+}
+
+/**
+ * Generate a secure CSRF token for the session
+ * Token is stored in session and must match on form submission
+ *
+ * @return string CSRF token
+ * @throws Exception If random_bytes() is not available
+ */
+function generateCsrfToken(): string
+{
+    if (!isset($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
 }

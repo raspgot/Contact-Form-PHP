@@ -34,6 +34,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const alertContainer = document.getElementById('alert-status');
     
     let isSubmitting = false; // Prevent duplicate submissions
+    let csrfToken = null; // Will be fetched on page load
+
+    // Fetch CSRF token on page load
+    (async () => {
+        try {
+            const response = await fetch('csrf_token.php');
+            const data = await response.json();
+            csrfToken = data.csrf_token;
+        } catch (error) {
+            console.error('Failed to fetch CSRF token:', error);
+        }
+    })();
 
     // 2. Setup live validation (show green/red feedback as user types)
     form.querySelectorAll('input, select, textarea').forEach((field) => {
@@ -115,8 +127,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Add token to form data
+            // Add reCAPTCHA token to form data
             formData.append('recaptcha_token', recaptchaToken);
+            
+            // Add CSRF token to form data for security
+            if (!csrfToken) {
+                throw new Error('⚠️ Security token not available. Please refresh the page.');
+            }
+            formData.append('csrf_token', csrfToken);
 
             // Step 3: Send form data to backend
             const response = await fetch(backendURL, {
