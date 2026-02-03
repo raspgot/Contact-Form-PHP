@@ -1,0 +1,36 @@
+# Security headers for Apache
+# Add these security headers to all responses
+
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Prevent clickjacking attacks
+    Header always set X-Frame-Options "DENY"
+    
+    # Enable XSS filter
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Control referrer information
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Remove server signature
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+</IfModule>
+
+# Disable directory browsing
+Options -Indexes
+
+# Prevent access to hidden files and directories
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Disable server signature
+ServerSignature Off
+
+# Protect configuration files
+<FilesMatch "^(composer\.json|composer\.lock|package\.json|package-lock\.json|\.env)$">
+    Require all denied
+</FilesMatch>

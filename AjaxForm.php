@@ -418,18 +418,3 @@ function checkSessionRateLimit(int $max = 5, int $window = 3600): void
     // Record this submission
     $_SESSION['rate_limit_times'][] = $now;
 }
-
-/**
- * Generate a secure CSRF token for the session
- * Token is stored in session and must match on form submission
- *
- * @return string CSRF token
- * @throws Exception If random_bytes() is not available
- */
-function generateCsrfToken(): string
-{
-    if (!isset($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-    return $_SESSION['csrf_token'];
-}
