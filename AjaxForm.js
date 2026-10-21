@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Step 3: Send form data to backend
             const response = await fetch(backendURL, {
                 method: 'POST',
-                body: formData,
+                body: new URLSearchParams(formData),
                 headers: { Accept: 'application/json' },
             });
 
